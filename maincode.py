@@ -14,7 +14,7 @@ def home():
         return redirect(url_for("credits"))
 
     # Fetching HTML from GitHub (Not Recommended for Live Apps)
-    github_html_url = "https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/main/Bluff.html"
+    github_html_url = "https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@main/Bluff.html"
     response = requests.get(github_html_url)
 
     return response.text  # Returns the HTML content
