@@ -1,12 +1,31 @@
-from flask import Flask
-import requests as req
+from flask import Flask, request, redirect, url_for, render_template
+import requests
 
 app = Flask(__name__)
 
-@app.route(methods = ["POST"])
+@app.route("/", methods=["POST", "GET"])
 def home():
-    if play:
-        reroute(url_for('rooms'))
-    elif about:
-        reroute(url_for('credits'))
-    return render_template(req.get('https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/main/Bluff.html'))
+    # Check which button was clicked
+    action = request.form.get("action")  # Gets the value of the clicked button
+
+    if action == "play":
+        return redirect(url_for("rooms"))
+    elif action == "about":
+        return redirect(url_for("credits"))
+
+    # Fetching HTML from GitHub (Not Recommended for Live Apps)
+    github_html_url = "https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/main/Bluff.html"
+    response = requests.get(github_html_url)
+
+    return response.text  # Returns the HTML content
+
+@app.route("/rooms")
+def rooms():
+    return "<h2>Welcome to the Rooms Page</h2>"
+
+@app.route("/credits")
+def credits():
+    return "<h2>Game Credits Page</h2>"
+
+if __name__ == "__main__":
+    app.run(debug=True)
