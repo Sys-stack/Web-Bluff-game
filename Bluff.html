@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluff Game</title>
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @font-face {
+            font-family: "bluff";
+            src: url('https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@style-font-decor/QuartzoBold-W9lv.ttf') format('truetype');
+        }
+
+        
+        html, body {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: url('https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/flat-design-poker-table-background_23-2151086552.jpg');
+            background-size: cover;
+            background-repeat: repeat;
+            background-position: center;
+            background-color: #004d40; 
+        }
+
+        .game-title {
+            font-family: "bluff", sans-serif;
+            color: #d4f8e8; 
+            text-align: center;
+            -webkit-text-stroke-width: 2px;
+            -webkit-text-stroke-color: rgba(0, 150, 136, 0.9);
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+    
+        .game-title1 {
+            font-family: "bluff", sans-serif;
+            color: #d4f8e8; /* Light greenish-blue */
+            text-align: center;
+            -webkit-text-stroke-width: 2px;
+            -webkit-text-stroke-color: rgba(0, 150, 136, 0.5);
+            font-size: 2rem;
+            background-color: rgba(255,255,255,0.5);
+            border: none;
+            padding: 10px 10px;
+            border-radius: 5px;
+            margin-bottom: 50px;
+        }
+
+        /* Main menu layout */
+        .mainmenu {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            height: 390px;
+            width: 320px;
+            border-radius: 10px;
+            max-width: 600px;
+            background: rgba(0,150,136,0.5);
+            padding 10px;
+        }
+
+        /* Menu items container */
+        .menuitems {
+            background: rgba(0, 150, 136, 1); /* Teal background */
+            padding: 15px;
+            text-align: center;
+            border-radius: 20px;
+            color: white;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+        }
+
+        /* Buttons */
+        .mainbutton {
+            font-family: "bluff";
+            background: transparent;
+            color: #d4f8e8;
+            padding: 12px 50px;
+            text-align: center;
+            font-size: 1.2rem;
+            border: solid 2px #d4f8e8;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            width: 250px;
+            transition: 0.3s;
+        }
+
+        /* Button hover effect */
+        .mainbutton:hover {
+            background: rgba(212, 248, 232, 0.3);
+            color: #004d40;
+            border-color: #004d40;
+            width: 275px;
+        }
+
+        /* Rules text */
+        .menuitems p {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive design for smaller screens */
+        @media screen and (max-width: 768px) {
+            .mainmenu {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="game-title"><u>BLUFF</u></h1>
+
+    <div class="mainmenu">
+        <div class="menuitems">
+            <button class="mainbutton">PLAY</button> <br>
+            <button class="mainbutton">ABOUT</button>
+        </div>
+        <div class="menuitems">
+            <p>
+                <strong class = "game-title1"><b>RULES</b></strong> <br>
+                1. <br>
+                2. <br>
+                3. <br>
+                4. <br>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
