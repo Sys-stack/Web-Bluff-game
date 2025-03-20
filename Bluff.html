@@ -27,12 +27,21 @@
             justify-content: center;
             overflow: hidden;
             background-image: url('https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/flat-design-poker-table-background_23-2151086552.jpg');
-            background-size: cover;
+            background-size: 300px;
             background-repeat: repeat;
             background-position: center;
             background-color: #004d40; 
+            animation: moveBackground 10s linear infinite;
         }
 
+        @keyframes moveBackground {
+            from { 
+                background-position: 0 0;
+            }
+            to {
+                background-position: 300px 300px;
+            }
+        }
         .game-title {
             font-family: "bluff", sans-serif;
             color: #d4f8e8; 
@@ -41,6 +50,7 @@
             -webkit-text-stroke-color: rgba(0, 150, 136, 0.9);
             font-size: 5rem;
             margin-bottom: 20px;
+            text-shadow: 4px 4px 5px rgb(0, 0, 0);
         }
     
         .game-title1 {
@@ -49,10 +59,9 @@
             text-align: center;
             -webkit-text-stroke-width: 2px;
             -webkit-text-stroke-color: rgba(0, 150, 136, 0.5);
-            font-size: 2rem;
-            background-color: rgba(255,255,255,0.5);
+            font-size: 3rem;
             border: none;
-            padding: 10px 10px;
+            margin-top: 1px;
             border-radius: 5px;
             margin-bottom: 50px;
         }
@@ -62,11 +71,10 @@
             display: flex;
             justify-content: center;
             gap: 20px;
-            height: 390px;
-            width: 320px;
-            border-radius: 10px;
+            max-height: 300px
+            width: 400px;
             max-width: 600px;
-            background: rgba(0,150,136,0.5);
+            background: rgba(0,150,136,0);
             padding 10px;
         }
 
@@ -77,8 +85,9 @@
             text-align: center;
             border-radius: 20px;
             color: white;
+            border: solid 2px rgba(0, 190, 156, 1);
             width: 300px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+            box-shadow: 0 4px 5px rgba(0, 0, 0, 0.9);
         }
 
         /* Buttons */
