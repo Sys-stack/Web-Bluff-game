@@ -33,7 +33,11 @@
             background-color: #004d40; 
             animation: moveBackground 10s linear infinite;
         }
-
+        .hitbox {
+            width: 100%;
+            max-width: 400px;
+            height: 40px;
+        }
         @keyframes moveBackground {
             from { 
                 background-position: 0 0;
@@ -144,8 +148,8 @@
     <div class="mainmenu">
         <div class="menuitems">
             <form action = '/' method = 'POST'>
-            <button type='submit' name = 'action' value = 'play' class="mainbutton">PLAY</button> <br>
-            <button type='submit' name = 'action' value = 'about' class="mainbutton">ABOUT</button>
+            <div class = 'hitbox'><button type='submit' name = 'action' value = 'play' class="mainbutton">PLAY</button> </div> <br>
+            <div class = 'hitbox'><button type='submit' name = 'action' value = 'about' class="mainbutton">ABOUT</button> </div>
             </form>
         </div>
         <div class="menuitems">
