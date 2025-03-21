@@ -10,9 +10,22 @@ supabase: Client = create_client(url, key)
 
 app = Flask(__name__)
 
-@app.route("/rooms")
+@app.route("/rooms", methods=["POST","GET"])
 def rooms():
-    return "<h2>Welcome to the Rooms Page</h2>"
+    roomaction = request.form.get(action)
+    if action == "newroom":
+        return redirect(url_for("newroom"))
+    if action == "oldroom":
+        return redirect(url_for("oldroom"))
+
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    username = request.form['username']
+    color = request.form['color']
+    
+    
+    github_room_html_url = "https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/main/rooms.html"
+    roomresponse = requests.get(github_room_html_url)
+    return roomresponse.text
 
 @app.route("/credits")
 def credits():
