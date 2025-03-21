@@ -3,8 +3,8 @@ import requests
 from supabase import create_client, Client
 import os
 
-url = os.environ.get("https://gsimtnnbcszbitjibtdn.supabase.co")
-key = os.environ.get("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzaW10bm5iY3N6Yml0amlidGRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0NTgxNDMsImV4cCI6MjA1ODAzNDE0M30.DIi45qbB4GLYyKLT0lGliI7aQuo4TPVgr-OPn-cbKVQ")
+url = os.environ.get("supabase_url")
+key = os.environ.get("supabase_api")
 supabase: Client = create_client(url, key)
 
 
