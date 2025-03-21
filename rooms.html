@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluff Game</title>
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @font-face {
+            font-family: "bluff";
+            src: url('https://github.com/Sys-stack/Web-Bluff-game/raw/refs/heads/style-font-decor/Blocktopia.ttf') format('truetype');
+        }
+
+        
+        html, body {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: url('https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/flat-design-poker-table-background_23-2151086552.jpg');
+            background-size: 300px;
+            background-repeat: repeat;
+            background-position: center;
+            background-color: #004d40; 
+            animation: moveBackground 10s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            from { 
+                background-position: 0 0;
+            }
+            to {
+                background-position: 300px 300px;
+            }
+        }
+        .game-title {
+            font-family: "bluff", sans-serif;
+            color: #d4f8e8; 
+            text-align: center;
+            -webkit-text-stroke-width: 2px;
+            -webkit-text-stroke-color: rgba(0, 150, 136, 0.9);
+            font-size: 5rem;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 5px rgb(0, 0, 0);
+        }
+    
+        .game-title1 {
+            font-family: "bluff", sans-serif;
+            color: #d4f8e8; /* Light greenish-blue */
+            text-align: center;
+            -webkit-text-stroke-width: 2px;
+            -webkit-text-stroke-color: rgba(0, 150, 136, 0.5);
+            font-size: 3rem;
+            border: none;
+            margin-top: 1px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        /* Main menu layout */
+        .mainmenu {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            max-height: 300px
+            width: 400px;
+            max-width: 600px;
+            background: rgba(0,150,136,0);
+            padding 10px;
+        }
+
+        /* Menu items container */
+        .menuitems {
+            background: rgba(0, 150, 136, 1); /* Teal background */
+            padding: 15px;
+            
+            border-radius: 20px;
+            color: white;
+            border: solid 2px rgba(0, 190, 156, 1);
+            width: 750px;
+            box-shadow: 0 4px 5px rgba(0, 0, 0, 0.9);
+            margin-bottom: 10px;
+        }
+
+        .cardtext {
+            font-family: 'bluff';
+            letter-spacing: 2px;
+            border: none;
+            text-align: left;
+        }
+        /* Buttons */
+        .mainbutton {
+            font-family: "bluff";
+            display: block;
+            margin: auto;
+            background: transparent;
+            color: #d4f8e8;
+            padding: 12px 50px;
+            text-align: center;
+            font-size: 1.2rem;
+            border: solid 2px #d4f8e8;
+            border-radius: 20px;
+            margin-top: 10px;
+            
+            margin-bottom: 10px;
+            cursor: pointer;
+            width: 600px;
+            height: 40px;
+            transition: 0.3s;
+        }
+
+        /* Button hover effect */
+        .mainbutton:hover {
+            background: rgba(212, 248, 232, 0.3);
+            color: #004d40;
+            border-color: #004d40;
+            width: 275px;
+        }
+
+        /* Rules text */
+        .menuitems p {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive design for smaller screens */
+        @media screen and (max-width: 768px) {
+            .mainmenu {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="game-title"><u>ROOMS</u></h1>
+
+ 
+        <div class="menuitems">
+            <form action = '/rooms' method = 'POST'>
+            <button type='submit' name = 'action' value = 'newroom' class="mainbutton">CREATE ROOM</button> <br>
+            <button type='submit' name = 'action' value = 'oldroom' class="mainbutton">JOIN ROOM</button>
+            </form>
+        </div>
+        <div class="menuitems">
+            <form action = "/rooms" method = "POST">
+            <h2 class = 'game-title1'>PROFILE</h2>
+            <label class = 'cardtext'>USERNAME: </label> <input type='text' name='username' placeholder="USERNAME"> <br>
+            <label class = 'cardtext'>COLOR: </label> <input type='color' name='color'> <br>
+            <button class = 'mainbutton' type = 'submit'> SUBMIT </button>
+            </form>
+        </div>
+</body>
+</html>
