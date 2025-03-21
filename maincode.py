@@ -12,19 +12,20 @@ app = Flask(__name__)
 
 @app.route("/rooms", methods=["POST","GET"])
 def rooms():
-    roomaction = request.form.get(action)
-    if action == "newroom":
+    roomaction = request.form.get("action")  # Fix variable name
+
+    if roomaction == "newroom":
         return redirect(url_for("newroom"))
-    if action == "oldroom":
+    elif roomaction == "oldroom":
         return redirect(url_for("oldroom"))
 
     ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    username = request.form['username']
-    color = request.form['color']
-    
-    
+    username = request.form.get("username")  # Fix: Use .get() to prevent errors
+    color = request.form.get("color")  # Fix: Use .get()
+
     github_room_html_url = "https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/main/rooms.html"
     roomresponse = requests.get(github_room_html_url)
+    
     return roomresponse.text
 
 @app.route("/credits")
