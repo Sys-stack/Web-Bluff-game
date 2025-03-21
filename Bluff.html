@@ -42,6 +42,11 @@
                 background-position: 300px 300px;
             }
         }
+        @keyframes button {
+            from { width: 90%;
+                   max-width: 400px}
+            to   { width: 100px;}
+        }
         .game-title {
             font-family: "bluff", sans-serif;
             color: #d4f8e8; 
@@ -105,6 +110,8 @@
             cursor: pointer;
             width: 250px;
             transition: 0.3s;
+            overflow: hidden;
+            overflow-text: ellipsis;
         }
 
         /* Button hover effect */
@@ -113,6 +120,7 @@
             color: #004d40;
             border-color: #004d40;
             width: 275px;
+            animation: button 0.25s alternate infinite;
         }
 
         /* Rules text */
