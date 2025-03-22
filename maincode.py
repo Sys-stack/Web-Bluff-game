@@ -13,7 +13,7 @@ app = Flask(__name__)
 def play():
     play_github_html = "https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@main/lobby.html"
     playresponse = requests.get(play_github_html)
-    return play_github_html.text
+    return playresponse.text
     
 @app.route("/newroom", methods=["GET", "POST"])
 def newroom():
