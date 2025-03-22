@@ -8,35 +8,45 @@ key = os.environ.get("supabase_api")
 supabase: Client = create_client(url, key)
 
 app = Flask(__name__)
+
 @app.route("/play", methods=["GET", "POST"])
 def play():
-    return "<text>play</text>"
+    play_github_html = "https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@main/lobby.html"
+    playresponse = requests.get(play_github_html)
+    return play_github_html.text
     
 @app.route("/newroom", methods=["GET", "POST"])
 def newroom():
-    
     username = request.cookies.get("username")  
     color = request.cookies.get("color")  
     password = request.form.get("password")
     roomname = request.form.get("roomname")
     user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    
-    response = (supabase.table('rooms')
-    .insert({"id": user_ip, "password": password, "name": roomname})
-    .execute())
-    
-    response = (supabase.table('userinfo')
-    .insert({"ip": user_ip, "username": username, "color":color, "roomname": roomname})
-    .execute())
-    
-    if (username and password):
-        return redirect(url_for("play"))
 
+    if not username:
+        return "Please set your profile before creating a room.", 400
+
+    response_room = supabase.table('rooms').upsert({
+    "id": user_ip,  
+    "password": password,
+    "name": roomname
+    }, on_conflict=["id"]).execute()
+
+
+    response_user = supabase.table('userinfo').upsert({
+    "ip": user_ip,
+    "username": username,
+    "color": color,
+    "roomname": roomname
+     }, on_conflict=["ip"]).execute()
+     
+    if password and roomname:
+        return redirect(url_for("play"))
     
     newroom_github_html = "https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/newroom.html"
     page = requests.get(newroom_github_html)
     return render_template_string(page.text, password = password, roomname = roomname)
-
+    
 @app.route("/rooms", methods=["POST", "GET"])
 def rooms():
     # Handle Room Actions
