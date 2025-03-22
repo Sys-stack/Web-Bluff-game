@@ -11,7 +11,7 @@ supabase: Client = create_client(url, key)
 app = Flask(__name__)
 
 @app.route("/newroom", methods=["POST"])
-def newroom:
+def newroom():
     username = request.cookies.get(username)
     return render_template("<h> Welcome {{ username }} </h>", username = username)
 @app.route("/rooms", methods=["POST","GET"])
