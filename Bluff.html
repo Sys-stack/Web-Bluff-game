@@ -1,166 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bluff Game</title>
-    <style>
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bluff Game</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        @font-face {
-            font-family: "bluff";
-            src: url('https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@style-font-decor/Blocktopia.ttf') format('truetype');
-        }
+    @font-face {
+      font-family: "bluff";
+      src: url('https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@style-font-decor/Blocktopia.ttf') format('truetype');
+    }
 
-        
-        html, body {
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background-image: url('https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/flat-design-poker-table-background_23-2151086552.jpg');
-            background-size: 300px;
-            background-repeat: repeat;
-            background-position: center;
-            background-color: #004d40; 
-            animation: moveBackground 10s linear infinite;
-        }
-        .hitbox {
-            width: 100%;
-            max-width: 400px;
-            height: 40px;
-        }
-        @keyframes moveBackground {
-            from { 
-                background-position: 0 0;
-            }
-            to {
-                background-position: 300px 300px;
-            }
-        }
-        @keyframes button {
-            from { width: 90%;
-                   max-width: 400px}
-            to   { width: 100px;}
-        }
-        .game-title {
-            font-family: "bluff", sans-serif;
-            color: #d4f8e8; 
-            text-align: center;
-            -webkit-text-stroke-width: 2px;
-            -webkit-text-stroke-color: rgba(0, 150, 136, 0.9);
-            font-size: 5rem;
-            margin-bottom: 20px;
-            text-shadow: 4px 4px 5px rgb(0, 0, 0);
-        }
-    
-        .game-title1 {
-            font-family: "bluff", sans-serif;
-            color: #d4f8e8; /* Light greenish-blue */
-            text-align: center;
-            -webkit-text-stroke-width: 2px;
-            -webkit-text-stroke-color: rgba(0, 150, 136, 0.5);
-            font-size: 3rem;
-            border: none;
-            margin-top: 1px;
-            border-radius: 5px;
-            margin-bottom: 50px;
-        }
+    html, body {
+      min-height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      background-image: url('https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/flat-design-poker-table-background_23-2151086552.jpg');
+      background-size: 300px;
+      background-repeat: repeat;
+      background-position: center;
+      background-color: #000;
+      animation: moveBackground 10s linear infinite;
+      font-family: "bluff", sans-serif;
+      color: white;
+      padding: 30px 10px;
+    }
 
-        /* Main menu layout */
-        .mainmenu {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            max-height: 300px
-            width: 400px;
-            max-width: 600px;
-            background: rgba(0,150,136,0);
-            padding 10px;
-        }
+    @keyframes moveBackground {
+      from { background-position: 0 0; }
+      to { background-position: 300px 300px; }
+    }
 
-        /* Menu items container */
-        .menuitems {
-            background: rgba(0, 150, 136, 1); /* Teal background */
-            padding: 15px;
-            text-align: center;
-            border-radius: 20px;
-            color: white;
-            border: solid 2px rgba(0, 190, 156, 1);
-            width: 300px;
-            box-shadow: 0 4px 5px rgba(0, 0, 0, 0.9);
-        }
+    @keyframes buttonPulse {
+      0% { width: 250px; }
+      100% { width: 300px; }
+    }
 
-        /* Buttons */
-        .mainbutton {
-            font-family: "bluff";
-            background: transparent;
-            color: #d4f8e8;
-            padding: 12px 50px;
-            text-align: center;
-            font-size: 1.2rem;
-            border: solid 2px #d4f8e8;
-            border-radius: 5px;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            width: 250px;
-            transition: 0.3s;
-            overflow: hidden;
-            overflow-text: ellipsis;
-        }
+    .game-title {
+      font-family: "bluff", sans-serif;
+      color: white;
+      text-align: center;
+      -webkit-text-stroke-width: 2px;
+      -webkit-text-stroke-color: red;
+      font-size: 5rem;
+      margin-bottom: 30px;
+      text-shadow: 4px 4px 5px black;
+    }
 
-        /* Button hover effect */
-        .mainbutton:hover {
-            background: rgba(212, 248, 232, 0.3);
-            color: #004d40;
-            border-color: #004d40;
-            width: 275px;
-            animation: button 0.25s alternate infinite;
-        }
+    .mainmenu {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 30px;
+      max-width: 1000px;
+      padding: 20px;
+    }
 
-        /* Rules text */
-        .menuitems p {
-            font-size: 1rem;
-            line-height: 1.5;
-        }
+    .menuitems {
+      background: black;
+      padding: 25px 30px;
+      border-radius: 20px;
+      color: white;
+      border: 2px solid white;
+      width: 350px;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); /* gold glow */
+      text-align: center;
+      height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow: hidden;
+    }
 
-        /* Responsive design for smaller screens */
-        @media screen and (max-width: 768px) {
-            .mainmenu {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-    </style>
+    .mainbutton {
+      font-family: "bluff";
+      background: transparent;
+      color: white;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      border: 2px solid white;
+      border-radius: 5px;
+      margin: 10px auto;
+      cursor: pointer;
+      width: 250px;
+      transition: width 0.3s ease;
+      display: block;
+    }
+
+    .mainbutton:hover {
+      color: red;
+      border-color: red;
+      background: rgba(255, 255, 255, 0.05);
+      animation: buttonPulse 0.6s alternate infinite;
+    }
+
+    .rules-title {
+      font-size: 2rem;
+      color: gold;
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 2px black;
+    }
+
+    .rules-text {
+      text-align: left;
+      line-height: 1.5;
+      font-size: 1rem;
+      padding-right: 5px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* Custom scrollbar (optional) */
+    .rules-text::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .rules-text::-webkit-scrollbar-thumb {
+      background-color: red;
+      border-radius: 10px;
+    }
+
+    @media screen and (max-width: 768px) {
+      .mainmenu {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1 class="game-title"><u>BLUFF</u></h1>
+  <h1 class="game-title"><u>BLUFF</u></h1>
 
-    <div class="mainmenu">
-        <div class="menuitems">
-            <form action = '/' method = 'POST'>
-            <div class = 'hitbox'><button type='submit' name = 'action' value = 'play' class="mainbutton">PLAY</button> </div> <br>
-            <div class = 'hitbox'><button type='submit' name = 'action' value = 'about' class="mainbutton">ABOUT</button> </div>
-            </form>
-        </div>
-        <div class="menuitems">
-            <p>
-                <strong class = "game-title1"><b>RULES</b></strong> <br>
-                1. <br>
-                2. <br>
-                3. <br>
-                4. <br>
-            </p>
-        </div>
+  <div class="mainmenu">
+    <div class="menuitems">
+      <form action="/" method="POST">
+        <button type="submit" name="action" value="play" class="mainbutton">PLAY</button>
+        <button type="submit" name="action" value="about" class="mainbutton">ABOUT</button>
+      </form>
     </div>
+
+    <div class="menuitems">
+      <div class="rules-title">RULES</div>
+      <div class="rules-text">
+        1. Each player is dealt cards facedown.<br><br>
+        2. On your turn, place one or more cards facedown and declare them (e.g., "Two Jacks").<br><br>
+        3. Other players can either accept it or call "Bluff!"<br><br>
+        4. If you're lying and get caught, you take the whole pile. If not, the accuser takes it.<br><br>
+        5. The first player to get rid of all their cards wins.<br><br>
+        6. Lying is allowed — but risky!
+      </div>
+    </div>
+  </div>
 </body>
 </html>
