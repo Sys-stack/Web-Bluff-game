@@ -9,11 +9,20 @@ supabase: Client = create_client(url, key)
 
 app = Flask(__name__)
 
-@app.route("/play", methods=["GET", "POST"])
-def play():
-    play_github_html = "https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@main/lobby.html"
-    playresponse = requests.get(play_github_html)
-    return playresponse.text
+@app.route("/room/<roomname>")
+def lobby(roomname):
+   
+    response = supabase.table("rooms").select("password").eq("name", roomname).single().execute()
+    
+    if response.data:
+        room_password = response.data["password"]
+    else:
+        return "Room not found", 404
+
+   
+    html = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@main/lobby.html").text
+    return render_template_string(html, roomname=roomname, password=room_password)
+
     
 @app.route("/newroom", methods=["GET", "POST"])
 def newroom():
@@ -41,7 +50,8 @@ def newroom():
      }, on_conflict=["ip"]).execute()
      
     if password and roomname:
-        return redirect(url_for("play"))
+        return redirect(url_for("lobby", roomname=roomname))
+
     
     newroom_github_html = "https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/newroom.html"
     page = requests.get(newroom_github_html)
@@ -49,7 +59,7 @@ def newroom():
     
 @app.route("/rooms", methods=["POST", "GET"])
 def rooms():
-    # Handle Room Actions
+    
     roomaction = request.form.get("action")
 
     if roomaction == "newroom":
@@ -57,11 +67,11 @@ def rooms():
     elif roomaction == "oldroom":
         return redirect(url_for("oldroom"))
 
-    # Handle Profile Form Submission
+ 
     username = request.form.get("username")
     color = request.form.get("color")
 
-    # If only username is submitted, treat it as profile form
+
     if username:
         html = requests.get("https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/main/rooms.html").text
         resp = make_response(html)
@@ -69,7 +79,7 @@ def rooms():
         resp.set_cookie("color", color or "#ffffff", max_age=60*60*24)
         return resp
 
-    # Fallback: Just render page with cookies if nothing is submitted
+
     username = request.cookies.get("username", "")
     color = request.cookies.get("color", "#ffffff")
 
