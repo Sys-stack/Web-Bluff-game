@@ -10,6 +10,10 @@ supabase: Client = create_client(url, key)
 
 app = Flask(__name__)
 
+@app.route("/newroom", methods=["POST"])
+def newroom:
+    username = request.cookies.get(username)
+    return render_template("<h> Welcome {{ username }} </h>", username = username)
 @app.route("/rooms", methods=["POST","GET"])
 def rooms():
     roomaction = request.form.get("action")  # Fix variable name
@@ -19,14 +23,15 @@ def rooms():
     elif roomaction == "oldroom":
         return redirect(url_for("oldroom"))
 
-    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     username = request.form.get("username")  # Fix: Use .get() to prevent errors
     color = request.form.get("color")  # Fix: Use .get()
 
     github_room_html_url = "https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/main/rooms.html"
-    roomresponse = requests.get(github_room_html_url)
-    
-    return roomresponse.text
+    roomrender = requests.get(github_room_html_url)
+    roomresponse = make_response(render_template(roomrender.text)
+    roomresponse.set_cookie('username', username, max_age = 60*60*24)
+    roomresponse.set_cookie('color', color, max_age = 60*60*24)
+    return roomresponse
 
 @app.route("/credits")
 def credits():
