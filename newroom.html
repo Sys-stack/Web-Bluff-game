@@ -147,8 +147,8 @@
         <div class="menuitems">
             <form action = "/newroom" method = "POST">
             <h2 class = 'game-title1'>DETAILS</h2>
-            <label class = 'cardtext'>ROOM NAME: </label> <input type='text' name='roomname' placeholder="ROOMNAME"> <br>
-            <label class = 'cardtext'>PASSWORD: </label> <input type='text' name='password' placeholder = "PASSWORD"> <br>
+            <label class = 'cardtext'>ROOM NAME: </label> <input type='text' name='roomname' placeholder= {{ roomname }}> <br>
+            <label class = 'cardtext'>PASSWORD: </label> <input type='text' name='password' placeholder = {{ password }}> <br>
             <button class = 'mainbutton' type = 'submit'> SUBMIT </button>
             </form>
         </div>
