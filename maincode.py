@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, render_template, make_response
+from flask import Flask, request, redirect, url_for, render_template, render_template_string, make_response
 import requests
 from supabase import create_client, Client
 import os
@@ -13,7 +13,7 @@ app = Flask(__name__)
 @app.route("/newroom", methods=["POST"])
 def newroom():
     username = request.cookies.get(username)
-    return render_template("<h> Welcome {{ username }} </h>", username = username)
+    return render_template_string("<h> Welcome {{ username }} </h>", username = username)
 @app.route("/rooms", methods=["POST","GET"])
 def rooms():
     roomaction = request.form.get("action")  # Fix variable name
@@ -28,7 +28,7 @@ def rooms():
 
     github_room_html_url = "https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/main/rooms.html"
     roomrender = requests.get(github_room_html_url)
-    roomresponse = make_response(render_template(roomrender.text)
+    roomresponse = make_response(render_template(roomrender.text))
     roomresponse.set_cookie('username', username, max_age = 60*60*24)
     roomresponse.set_cookie('color', color, max_age = 60*60*24)
     return roomresponse
