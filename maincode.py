@@ -29,7 +29,7 @@ def rooms():
 
     
     html = requests.get("https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/main/rooms.html").text
-    resp = make_response(render_template_string(html))  # using render_template_string for raw HTML
+    resp = make_response(html.text) # using render_template_string for raw HTML
     resp.set_cookie('username', username, max_age=60*60*24)
     resp.set_cookie('color', color, max_age=60*60*24)
     return resp
