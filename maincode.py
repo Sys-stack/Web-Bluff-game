@@ -16,23 +16,33 @@ def newroom():
 
 @app.route("/rooms", methods=["POST", "GET"])
 def rooms():
+    # Handle Room Actions
     roomaction = request.form.get("action")
 
     if roomaction == "newroom":
         return redirect(url_for("newroom"))
     elif roomaction == "oldroom":
-        return redirect(url_for("oldroom"))  # Make sure this route exists
+        return redirect(url_for("oldroom"))
 
-    # Handle profile form submission
+    # Handle Profile Form Submission
     username = request.form.get("username")
     color = request.form.get("color")
 
-    
+    # If only username is submitted, treat it as profile form
+    if username:
+        html = requests.get("https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/main/rooms.html").text
+        resp = make_response(html)
+        resp.set_cookie("username", username, max_age=60*60*24)
+        resp.set_cookie("color", color or "#ffffff", max_age=60*60*24)
+        return resp
+
+    # Fallback: Just render page with cookies if nothing is submitted
+    username = request.cookies.get("username", "")
+    color = request.cookies.get("color", "#ffffff")
+
     html = requests.get("https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/main/rooms.html").text
-    resp = make_response(html) # using render_template_string for raw HTML
-    resp.set_cookie('username', username, max_age=60*60*24)
-    resp.set_cookie('color', color, max_age=60*60*24)
-    return resp
+    return html
+
     
 @app.route("/credits")
 def credits():
