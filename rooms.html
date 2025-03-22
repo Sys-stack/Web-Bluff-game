@@ -1,203 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bluff Game</title>
-    <style>
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bluff Game</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        @font-face {
-            font-family: "bluff";
-            src: url('https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@style-font-decor/Blocktopia.ttf') format('truetype');
-        }
+    @font-face {
+      font-family: "bluff";
+      src: url('https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@style-font-decor/Blocktopia.ttf') format('truetype');
+    }
 
-                .hitbox {
-            width: 100%;
-            max-width: 400px;
-            height: 40px;
-                }
-        html, body {
-            min-height: 100vh;
-            width: 100vw;
-            overflow-x: hidden;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            
-            background-image: url('https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/flat-design-poker-table-background_23-2151086552.jpg');
-            background-size: 300px;
-            background-repeat: repeat;
-            background-position: center;
-            background-color: #004d40; 
-            animation: moveBackground 10s linear infinite;
-        }
-        
-        input[type="text"], input[type="color"] {
-        padding: 10px 15px;
-        border: 2px solid rgba(0, 150, 136, 0.7);
-        border-radius: 10px;
-        background-color: #e0f2f1;
-        font-family: "bluff", sans-serif;
-        font-size: 1rem;
-        color: #004d40;
-        outline: none;
-        transition: 0.3s;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-        margin-bottom: 15px;
-        width: 80%;
-        max-width: 300px;
-     }
+    html, body {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: black;
+      background-image: url('https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/flat-design-poker-table-background_23-2151086552.jpg');
+      background-size: 300px;
+      background-repeat: repeat;
+      animation: moveBackground 10s linear infinite;
+      font-family: "bluff", sans-serif;
+      color: white;
+    }
 
-        input[type="text"]:focus, input[type="color"]:focus {
-        border-color: #26a69a;
-        background-color: #ffffff;
-        box-shadow: 0 0 5px #26a69a;
-        }
+    @keyframes moveBackground {
+      from { background-position: 0 0; }
+      to { background-position: 300px 300px; }
+    }
 
-        @keyframes moveBackground {
-            from { 
-                background-position: 0 0;
-            }
-            to {
-                background-position: 300px 300px;
-            }
-        }
-        
-        @keyframes button {
-            from { width: 90%;
-                   max-width: 400px}
-            to   { width: 100px;}
-        }
-    
-        .game-title {
-            font-family: "bluff", sans-serif;
-            color: #d4f8e8; 
-            text-align: center;
-            -webkit-text-stroke-width: 2px;
-            -webkit-text-stroke-color: rgba(0, 150, 136, 0.9);
-            font-size: 5rem;
-            margin-bottom: 20px;
-            text-shadow: 4px 4px 5px rgb(0, 0, 0);
-        }
-    
-        .game-title1 {
-            font-family: "bluff", sans-serif;
-            color: #d4f8e8; /* Light greenish-blue */
-            text-align: center;
-            -webkit-text-stroke-width: 2px;
-            -webkit-text-stroke-color: rgba(0, 150, 136, 0.5);
-            font-size: 3rem;
-            border: none;
-            margin-top: 1px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
+    @keyframes pulseWidth {
+      0% { transform: scaleX(1); }
+      50% { transform: scaleX(1.1); }
+      100% { transform: scaleX(0.95); }
+    }
 
-        /* Main menu layout */
-        .mainmenu {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            max-height: 300px;
-            width: 90%;
-            max-width: 600px;
-            background: rgba(0,150,136,0);
-            padding 10px;
-        }
+    .game-title {
+      color: white;
+      text-align: center;
+      font-size: 5rem;
+      -webkit-text-stroke: 2px black;
+      text-shadow: 4px 4px 5px black;
+      margin-bottom: 20px;
+    }
 
-        /* Menu items container */
-        .menuitems {
-            background: rgba(0, 150, 136, 1); /* Teal background */
-            padding: 15px;
-            width: 90%;
-            max-width: 600px;
-            border-radius: 20px;
-            color: white;
-            border: solid 2px rgba(0, 190, 156, 1);
-            max-width: 750px;
-            box-shadow: 0 4px 5px rgba(0, 0, 0, 0.9);
-            margin-bottom: 10px;
-        }
+    .game-title1 {
+      color: white;
+      text-align: center;
+      font-size: 2.5rem;
+      margin: 10px 0;
+    }
 
-        .cardtext {
-            font-family: 'bluff';
-            letter-spacing: 2px;
-            border: none;
-            text-align: left;
-        }
-        /* Buttons */
-        .mainbutton {
-            font-family: "bluff";
-            display: block;
-            margin: auto;
-            background: transparent;
-            color: #d4f8e8;
-            padding: 12px 50px;
-            text-align: center;
-            font-size: 1.2rem;
-            border: solid 2px #d4f8e8;
-            border-radius: 20px;
-            margin-top: 10px;
-            
-            margin-bottom: 10px;
-            cursor: pointer;
-            width: 90%;
-            max-width: 400px;
-            height: 40px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            transition: 0.3s;
-        }
+    .mainmenu {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 90%;
+      max-width: 600px;
+      flex-wrap: wrap;
+    }
 
-        /* Button hover effect */
-        .mainbutton:hover {
-            background: rgba(212, 248, 232, 0.3);
-            color: #004d40;
-            border-color: #004d40;
-            
-            animation: button 0.25s alternate infinite;
-        }
+    .menuitems {
+      background-color: black;
+      padding: 20px;
+      border-radius: 20px;
+      border: 2px solid white;
+      box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+      width: 90%;
+      max-width: 600px;
+    }
 
-        /* Rules text */
-        .menuitems p {
-            font-size: 1rem;
-            line-height: 1.5;
-        }
+    .cardtext {
+      font-size: 1rem;
+      margin-bottom: 5px;
+      display: block;
+      color: white;
+    }
 
-        /* Responsive design for smaller screens */
-        @media screen and (max-width: 768px) {
-            .mainmenu {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-    </style>
+    input[type="text"], input[type="color"] {
+      padding: 10px 15px;
+      border: 2px solid white;
+      border-radius: 10px;
+      background-color: white;
+      font-family: "bluff", sans-serif;
+      font-size: 1rem;
+      color: black;
+      outline: none;
+      transition: 0.3s;
+      margin-bottom: 15px;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    input[type="text"]:focus, input[type="color"]:focus {
+      border-color: red;
+      box-shadow: 0 0 5px red;
+    }
+
+    .mainbutton {
+      font-family: "bluff", sans-serif;
+      background: black;
+      color: white;
+      padding: 12px 50px;
+      font-size: 1.2rem;
+      border: 2px solid red;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .mainbutton:hover {
+      color: black;
+      background-color: white;
+      border-color: red;
+      animation: pulseWidth 0.6s infinite alternate ease-in-out;
+    }
+
+    .hitbox {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    @media screen and (max-width: 768px) {
+      .mainmenu {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1 class="game-title"><u>ROOMS</u></h1>
+  <h1 class="game-title"><u>ROOMS</u></h1>
 
- 
-        <div class="menuitems">
-            <form action = '/rooms' method = 'POST'>
-            <div class = 'hitbox'><button type='submit' name = 'action' value = 'newroom' class="mainbutton">CREATE ROOM</button></div><br>
-            <div class = 'hitbox'><button type='submit' name = 'action' value = 'oldroom' class="mainbutton">JOIN ROOM</button></div>
-            </form>
-        </div>
-        <div class="menuitems">
-            <form action = "/rooms" method = "POST">
-            <h2 class = 'game-title1'>PROFILE</h2>
-            <label class = 'cardtext'>USERNAME: </label> <input type='text' name='username' placeholder="USERNAME"> <br>
-            <label class = 'cardtext'>COLOR: </label> <input type='color' name='color'> <br>
-            <div class = 'hitbox'><button class = 'mainbutton' type = 'submit'> SUBMIT </button></div>
-            </form>
-        </div>
+  <div class="menuitems">
+    <form action="/rooms" method="POST">
+      <div class="hitbox">
+        <button type="submit" name="action" value="newroom" class="mainbutton">CREATE ROOM</button>
+      </div>
+      <div class="hitbox">
+        <button type="submit" name="action" value="oldroom" class="mainbutton">JOIN ROOM</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="menuitems">
+    <form action="/rooms" method="POST">
+      <h2 class="game-title1">PROFILE</h2>
+      <label class="cardtext">USERNAME:</label>
+      <input type="text" name="username" placeholder="USERNAME" required />
+      <br />
+      <label class="cardtext">COLOR:</label>
+      <input type="color" name="color" />
+      <div class="hitbox">
+        <button class="mainbutton" type="submit">SUBMIT</button>
+      </div>
+    </form>
+  </div>
 </body>
 </html>
