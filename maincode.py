@@ -8,11 +8,22 @@ key = os.environ.get("supabase_api")
 supabase: Client = create_client(url, key)
 
 app = Flask(__name__)
-
 @app.route("/newroom", methods=["GET", "POST"])
 def newroom():
-    username = request.cookies.get("username")  # FIXED: use string key
-    return render_template_string("<h1>Welcome, {{ username }}!</h1>", username=username)
+    username = request.cookies.get("username")  
+    password = request.form.get("password")
+    roomname = request.form.get("roomname")
+    user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    
+    response = (
+    supabase.table('rooms')
+    .insert({"id": user_ip, "password": password, "name": roomname})
+    .execute()
+    )
+    
+    newroom_github_html = "https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/newroom.html"
+    page = requests.get(newroom_github_html)
+    return render_template_string(page.text, password = password, roomname = roomname)
 
 @app.route("/rooms", methods=["POST", "GET"])
 def rooms():
