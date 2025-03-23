@@ -10,7 +10,7 @@ supabase: Client = create_client(url, key)
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route("/", methods=["GET","POST"])
 def home():
     action = request.form.get("action")
 
@@ -23,7 +23,7 @@ def home():
     return html
 
 
-@app.route("/credits")
+@app.route("/credits", methods=["GET"])
 def credits():
     return "<h2>Game Credits Page</h2>"
 
@@ -86,7 +86,7 @@ def newroom():
     return render_template_string(page.text, password=password, roomname=roomname)
 
 
-@app.route("/room/<roomname>")
+@app.route("/room/<roomname>", methods=["GET","POST"])
 def lobby(roomname):
     response = supabase.table("rooms").select("password").eq("name", roomname).single().execute()
 
