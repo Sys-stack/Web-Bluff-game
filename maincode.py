@@ -133,7 +133,7 @@ def oldroom():
                         "username": username,
                         "color": color,
                         "roomname": roomname
-                    }, on_conflict=["ip"]).execute()).execute()
+                    }, on_conflict=["ip"]).execute()
 
                     return redirect(url_for("lobby", roomname=roomname))  
                 else:
