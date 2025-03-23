@@ -97,7 +97,7 @@ def lobby(roomname):
 
     user_response = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
     usernames = [user["username"] for user in user_response.data] if user_response.data else []
-    while username:
+    while usernames:
         p1 = usernames[0] if len(usernames) > 0 and usernames[0] else None
         p2 = usernames[1] if len(usernames) > 1 and usernames[1] else None
         p3 = usernames[2] if len(usernames) > 2 and usernames[2] else None
