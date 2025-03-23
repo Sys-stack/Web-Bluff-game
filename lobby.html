@@ -160,6 +160,16 @@
       background-color: red;
       color: white;
     }
+    
+    .player-item {
+      transition: background-color 0.3s ease;
+      padding: 5px;
+      border-radius: 5px;
+    }
+    
+    .player-item.highlight {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
   </style>
 </head>
 <body>
@@ -172,10 +182,10 @@
       <text>Password: {{password}}</text><br>
 
       <h2 class="game-title1">MEMBERS</h2><br>
-      <text>○ <span id="p1">{{ p1 }}</span></text><br>
-      <text>○ <span id="p2">{{ p2 }}</span></text><br>
-      <text>○ <span id="p3">{{ p3 }}</span></text><br>
-      <text>○ <span id="p4">{{ p4 }}</span></text><br><br>
+      <text class="player-item">○ <span id="p1">{{ p1 }}</span></text><br>
+      <text class="player-item">○ <span id="p2">{{ p2 }}</span></text><br>
+      <text class="player-item">○ <span id="p3">{{ p3 }}</span></text><br>
+      <text class="player-item">○ <span id="p4">{{ p4 }}</span></text><br><br>
 
       <button class="mainbutton" name="action" value="play">PLAY</button>
     </form>
@@ -234,22 +244,49 @@
       connectionStatus.className = 'connection-status disconnected';
     });
 
-    // Handle user updates
+    // Handle player updates - NEW FORMAT
+    socket.on('update_players', function(players) {
+      console.log("Received update_players event with data:", players);
+      
+      // Update each player slot and add highlight animation
+      Object.keys(players).forEach(slotId => {
+        const slot = document.getElementById(slotId);
+        if (slot) {
+          // Save old value to check if we need to highlight
+          const oldValue = slot.textContent;
+          const newValue = players[slotId];
+          
+          // Update the slot text
+          slot.textContent = newValue;
+          
+          // Add highlight animation if the value changed
+          if (oldValue !== newValue) {
+            const parentEl = slot.closest('.player-item');
+            if (parentEl) {
+              parentEl.classList.add('highlight');
+              setTimeout(() => {
+                parentEl.classList.remove('highlight');
+              }, 1000);
+            }
+          }
+        }
+      });
+    });
+    
+    // For backward compatibility - convert old format to new
     socket.on('update_users', function(usernames) {
       console.log("Received update_users event with data:", usernames);
-      const slots = ['p1', 'p2', 'p3', 'p4'];
       
-      // Clear all slots first
-      slots.forEach(slot => {
-        document.getElementById(slot).textContent = "None";
-      });
+      // Create players object in the format expected by update_players
+      const players = {
+        p1: usernames[0] || "None",
+        p2: usernames[1] || "None",
+        p3: usernames[2] || "None",
+        p4: usernames[3] || "None"
+      };
       
-      // Update with received usernames
-      for (let i = 0; i < usernames.length && i < slots.length; i++) {
-        if (usernames[i]) {
-          document.getElementById(slots[i]).textContent = usernames[i];
-        }
-      }
+      // Use the same handler for both event types
+      socket._callbacks.$update_players[0].call(socket, players);
     });
 
     // Handle page unload event
@@ -259,6 +296,35 @@
         socket.emit('leave', { room: roomname, username: username });
         navigator.sendBeacon("/user-left");
       }
+    });
+    
+    // Function to fetch updated player list periodically as a fallback
+    function pollForUpdates() {
+      fetch(`/api/room/${roomname}/players`)
+        .then(response => response.json())
+        .then(players => {
+          // Only update if WebSocket is disconnected
+          if (socket.disconnected) {
+            console.log("Polling for updates:", players);
+            
+            // Use the same update_players handler to update the UI
+            Object.keys(players).forEach(slotId => {
+              const slot = document.getElementById(slotId);
+              if (slot) {
+                slot.textContent = players[slotId];
+              }
+            });
+          }
+        })
+        .catch(error => console.error("Error polling for updates:", error));
+    }
+    
+    // Poll for updates every 5 seconds as a fallback mechanism
+    const pollInterval = setInterval(pollForUpdates, 5000);
+    
+    // Clean up interval on page unload
+    window.addEventListener("beforeunload", function() {
+      clearInterval(pollInterval);
     });
   </script>
 </body>
