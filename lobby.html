@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bluff Game</title>
   <style>
-    /* (same CSS as before) */
     * {
       margin: 0;
       padding: 0;
@@ -142,9 +141,29 @@
         align-items: center;
       }
     }
+    
+    .connection-status {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+    }
+    
+    .connected {
+      background-color: green;
+      color: white;
+    }
+    
+    .disconnected {
+      background-color: red;
+      color: white;
+    }
   </style>
 </head>
 <body>
+  <div id="connection-status" class="connection-status disconnected">WebSocket: Disconnected</div>
   <h1 class="game-title"><u>LOBBY</u></h1>
   <div class="menuitems">
     <form action="/newroom" method="POST">
@@ -170,24 +189,76 @@
       return parts.length === 2 ? parts.pop().split(';').shift() : null;
     }
 
-    const socket = io();
+    // Status indicator elements
+    const connectionStatus = document.getElementById('connection-status');
+    
+    // Get username and roomname
     const username = getCookie("username");
     const roomname = "{{ roomname }}";
+    
+    // Log important values for debugging
+    console.log("Username from cookie:", username);
+    console.log("Room name from template:", roomname);
 
-    socket.emit('join', { username: username, room: roomname });
+    // Initialize Socket.IO connection
+    const socket = io({
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
+    });
+    
+    // Socket connection event handlers
+    socket.on('connect', function() {
+      console.log('WebSocket connected!');
+      connectionStatus.textContent = 'WebSocket: Connected';
+      connectionStatus.className = 'connection-status connected';
+      
+      // Only attempt to join room if both username and roomname are available
+      if (username && roomname) {
+        console.log('Emitting join event for', username, 'to room', roomname);
+        socket.emit('join', { username: username, room: roomname });
+      } else {
+        console.error('Cannot join room: missing username or roomname');
+      }
+    });
+    
+    socket.on('connect_error', function(error) {
+      console.error('Connection error:', error);
+      connectionStatus.textContent = 'WebSocket: Error';
+      connectionStatus.className = 'connection-status disconnected';
+    });
+    
+    socket.on('disconnect', function() {
+      console.log('WebSocket disconnected');
+      connectionStatus.textContent = 'WebSocket: Disconnected';
+      connectionStatus.className = 'connection-status disconnected';
+    });
 
+    // Handle user updates
     socket.on('update_users', function(usernames) {
-      console.log("Users in room:", usernames);
+      console.log("Received update_users event with data:", usernames);
       const slots = ['p1', 'p2', 'p3', 'p4'];
-      for (let i = 0; i < slots.length; i++) {
-        const el = document.getElementById(slots[i]);
-        el.textContent = usernames[i] || "None";
+      
+      // Clear all slots first
+      slots.forEach(slot => {
+        document.getElementById(slot).textContent = "None";
+      });
+      
+      // Update with received usernames
+      for (let i = 0; i < usernames.length && i < slots.length; i++) {
+        if (usernames[i]) {
+          document.getElementById(slots[i]).textContent = usernames[i];
+        }
       }
     });
 
-    window.addEventListener("beforeunload", function () {
-      socket.emit('leave', { room: roomname, username: username });
-      navigator.sendBeacon("/user-left");
+    // Handle page unload event
+    window.addEventListener("beforeunload", function() {
+      if (socket.connected && username && roomname) {
+        console.log('Emitting leave event before page unload');
+        socket.emit('leave', { room: roomname, username: username });
+        navigator.sendBeacon("/user-left");
+      }
     });
   </script>
 </body>
