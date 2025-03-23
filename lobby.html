@@ -160,11 +160,31 @@
             <button class = 'mainbutton' name = 'action' value = 'play'> PLAY </button>
             </form>
         </div>
-  <script>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+    const socket = io();  // Connect to the server
+
+    const username = "{{ p1 }}"  // or grab from cookie
+    const roomname = "{{ roomname }}";
+
+    socket.emit('join', { username: username, room: roomname });
+
+    socket.on('update_users', function(usernames) {
+        // Dynamically update the DOM with the player names
+        console.log("Users in room:", usernames);
+
+        const slots = ['p1', 'p2', 'p3', 'p4'];
+        for (let i = 0; i < slots.length; i++) {
+            const slotEl = document.getElementById(slots[i]);
+            slotEl.textContent = usernames[i] || "None";
+        }
+    });
+
     window.addEventListener("beforeunload", function () {
-        navigator.sendBeacon("/user-left");
+        socket.emit('leave', { room: roomname });
     });
 </script>
+
 
 </body>
 </html>
