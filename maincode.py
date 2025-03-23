@@ -291,6 +291,7 @@ def handle_disconnect():
 # RUN THE SERVER
 # ------------------------
 
+# Only run when executing directly
 if __name__ == "__main__":
     import eventlet
     import eventlet.wsgi
