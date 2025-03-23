@@ -97,11 +97,11 @@ def lobby(roomname):
 
     user_response = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
     usernames = [user["username"] for user in user_response.data] if user_response.data else []
-
-    p1 = usernames[0] if len(usernames) > 0 and usernames[0] else None
-    p2 = usernames[1] if len(usernames) > 1 and usernames[1] else None
-    p3 = usernames[2] if len(usernames) > 2 and usernames[2] else None
-    p4 = usernames[3] if len(usernames) > 3 and usernames[3] else None
+    while username:
+        p1 = usernames[0] if len(usernames) > 0 and usernames[0] else None
+        p2 = usernames[1] if len(usernames) > 1 and usernames[1] else None
+        p3 = usernames[2] if len(usernames) > 2 and usernames[2] else None
+        p4 = usernames[3] if len(usernames) > 3 and usernames[3] else None
 
     html = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@main/lobby.html").text
     return render_template_string(html, roomname=roomname, password=room_password, p1=p1, p2=p2, p3=p3, p4=p4)
@@ -133,7 +133,7 @@ def oldroom():
                         "username": username,
                         "color": color,
                         "roomname": roomname
-                    }).execute()
+                    }, on_conflict=["ip"]).execute()).execute()
 
                     return redirect(url_for("lobby", roomname=roomname))  
                 else:
