@@ -2,3 +2,5 @@ flask
 requests
 gunicorn
 supabase
+flask-socketio
+python-socketio
