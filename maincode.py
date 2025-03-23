@@ -1,8 +1,10 @@
 from flask import Flask, request, redirect, url_for, render_template_string, make_response
+from flask_socketio import SocketIO, emit, join_room, leave_room
 import requests
 from supabase import create_client, Client
 import os
 
+# Setup Supabase
 url = os.environ.get("supabase_url")
 key = os.environ.get("supabase_api")
 
@@ -11,8 +13,9 @@ if not url or not key:
 
 supabase: Client = create_client(url, key)
 
+# Flask app setup
 app = Flask(__name__)
-
+socketio = SocketIO(app, cors_allowed_origins='*')
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -86,32 +89,31 @@ def newroom():
     return render_template_string(page.text, password=password, roomname=roomname)
 
 
-@app.route("/room/<roomname>", methods=["GET", "POST"])
+@app.route("/room/<roomname>", methods=["GET"])
 def lobby(roomname):
     response = supabase.table("rooms").select("password").eq("name", roomname).single().execute()
-
     if response.data:
         room_password = response.data["password"]
     else:
         return "Room not found", 404
 
+    # Get players (initially static)
     user_response = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
     usernames = [user["username"] for user in user_response.data] if user_response.data else []
     auto_refresh = len(usernames) < 4
-    p1 = usernames[0] if len(usernames) > 0 else None
-    p2 = usernames[1] if len(usernames) > 1 else None
-    p3 = usernames[2] if len(usernames) > 2 else None
-    p4 = usernames[3] if len(usernames) > 3 else None
 
-    html = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@main/lobby.html").text
-    return render_template_string(html, roomname=roomname, password=room_password, p1=p1, p2=p2, p3=p3, p4=p4, auto_refresh=auto_refresh)
+    return render_template_string(html, roomname=roomname, password=room_password,
+                                  p1=usernames[0] if len(usernames) > 0 else None,
+                                  p2=usernames[1] if len(usernames) > 1 else None,
+                                  p3=usernames[2] if len(usernames) > 2 else None,
+                                  p4=usernames[3] if len(usernames) > 3 else None,
+                                  auto_refresh=auto_refresh)
 
 
 @app.route("/oldroom", methods=["GET", "POST"])
 def oldroom():
     username = request.cookies.get("username")
     color = request.cookies.get("color")
-
     if not username or not color:
         return redirect(url_for("rooms"))
 
@@ -119,58 +121,73 @@ def oldroom():
     password = request.form.get("password")
     user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
 
-    error_message = None
-
     if roomname and password:
-        try:
-            room_data = supabase.table('rooms').select("*").eq("name", roomname).execute()
+        room_data = supabase.table('rooms').select("*").eq("name", roomname).execute()
+        if room_data.data:
+            stored_password = room_data.data[0]['password']
+            if password == stored_password:
+                supabase.table('userinfo').upsert({
+                    "ip": user_ip,
+                    "username": username,
+                    "color": color,
+                    "roomname": roomname
+                }, on_conflict=["ip"]).execute()
+                return redirect(url_for("lobby", roomname=roomname))
 
-            if room_data.data:
-                stored_password = room_data.data[0]['password']
-                if password == stored_password:
-                    supabase.table('userinfo').upsert({
-                        "ip": user_ip,
-                        "username": username,
-                        "color": color,
-                        "roomname": roomname
-                    }, on_conflict=["ip"]).execute()
+    page = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/oldroom.html").text
+    return render_template_string(page)
 
-                    return redirect(url_for("lobby", roomname=roomname))
-                else:
-                    error_message = "Incorrect password. Please try again."
-            else:
-                error_message = "Room not found. Please check the room name."
-        except Exception as e:
-            error_message = "An error occurred. Please try again later."
 
-    oldroom_github_html = "https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/oldroom.html"
-    page = requests.get(oldroom_github_html).text
-
-    return render_template_string(page)  # Optionally pass error=error_message if used in HTML
 @app.route("/user-left", methods=["POST"])
 def user_left():
     user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-
-    # Get the roomname before deleting the user
     user_entry = supabase.table("userinfo").select("roomname").eq("ip", user_ip).single().execute()
     if not user_entry.data:
         return "User not found", 404
 
     roomname = user_entry.data["roomname"]
-
-    # Delete user from userinfo
     supabase.table("userinfo").delete().eq("ip", user_ip).execute()
+    remaining = supabase.table("userinfo").select("ip").eq("roomname", roomname).execute()
 
-    # Check if anyone is still in the room
-    remaining_users = supabase.table("userinfo").select("ip").eq("roomname", roomname).execute()
-
-    if not remaining_users.data:
-        # No one left in the room, delete it
+    if not remaining.data:
         supabase.table("rooms").delete().eq("name", roomname).execute()
-        print(f"Room '{roomname}' deleted as it became empty.")
 
-    return "User and empty room (if any) removed", 200
+    return "User and empty room removed", 200
+
+# ------------------------
+# SOCKET.IO EVENTS
+# ------------------------
+
+@socketio.on('join')
+def handle_join(data):
+    roomname = data['room']
+    join_room(roomname)
+    user_response = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
+    usernames = [user["username"] for user in user_response.data]
+    emit('update_users', usernames, room=roomname)
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+@socketio.on('leave')
+def handle_leave(data):
+    roomname = data['room']
+    username = data.get('username')
+    leave_room(roomname)
+
+    user_entry = supabase.table("userinfo").select("ip").eq("username", username).eq("roomname", roomname).single().execute()
+    if user_entry.data:
+        supabase.table("userinfo").delete().eq("ip", user_entry.data["ip"]).execute()
+
+    # Check if room is now empty
+    remaining = supabase.table("userinfo").select("ip").eq("roomname", roomname).execute()
+    if not remaining.data:
+        supabase.table("rooms").delete().eq("name", roomname).execute()
+
+    # Update everyone
+    updated = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
+    usernames = [user["username"] for user in updated.data]
+    emit('update_users', usernames, room=roomname)
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print("A user disconnected — consider cleanup via heartbeat or timeout")
