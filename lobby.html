@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bluff Game</title>
   <style>
+    /* (same CSS as before) */
     * {
       margin: 0;
       padding: 0;
@@ -144,47 +145,50 @@
   </style>
 </head>
 <body>
-    <h1 class="game-title"><u>LOBBY</u></h1>
-        <div class="menuitems">
-            <form action = "/newroom" method = "POST">
-            <h2 class = 'game-title1'>ROOM INFO</h2><br>
-              <text>Roomname: {{roomname}}</text><br>
-              <text>Password: {{password}}</text><br>
-              
-              <h2 class = "game-title1"> MEMBERS</h2><br>
-              <text>○ {{p1}} </text><br>
-              <text>○ {{p2}} </text><br>
-              <text>○ {{p3}} </text><br>
-              <text>○ {{p4}} </text><br>
-              <br>
-            <button class = 'mainbutton' name = 'action' value = 'play'> PLAY </button>
-            </form>
-        </div>
-  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-<script>
-    const socket = io();  // Connect to the server
+  <h1 class="game-title"><u>LOBBY</u></h1>
+  <div class="menuitems">
+    <form action="/newroom" method="POST">
+      <h2 class="game-title1">ROOM INFO</h2><br>
+      <text>Roomname: {{roomname}}</text><br>
+      <text>Password: {{password}}</text><br>
 
-    const username = "{{ p1 }}"  // or grab from cookie
+      <h2 class="game-title1">MEMBERS</h2><br>
+      <text>○ <span id="p1">{{ p1 }}</span></text><br>
+      <text>○ <span id="p2">{{ p2 }}</span></text><br>
+      <text>○ <span id="p3">{{ p3 }}</span></text><br>
+      <text>○ <span id="p4">{{ p4 }}</span></text><br><br>
+
+      <button class="mainbutton" name="action" value="play">PLAY</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script>
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      return parts.length === 2 ? parts.pop().split(';').shift() : null;
+    }
+
+    const socket = io();
+    const username = getCookie("username");
     const roomname = "{{ roomname }}";
 
     socket.emit('join', { username: username, room: roomname });
 
     socket.on('update_users', function(usernames) {
-        // Dynamically update the DOM with the player names
-        console.log("Users in room:", usernames);
-
-        const slots = ['p1', 'p2', 'p3', 'p4'];
-        for (let i = 0; i < slots.length; i++) {
-            const slotEl = document.getElementById(slots[i]);
-            slotEl.textContent = usernames[i] || "None";
-        }
+      console.log("Users in room:", usernames);
+      const slots = ['p1', 'p2', 'p3', 'p4'];
+      for (let i = 0; i < slots.length; i++) {
+        const el = document.getElementById(slots[i]);
+        el.textContent = usernames[i] || "None";
+      }
     });
 
     window.addEventListener("beforeunload", function () {
-        socket.emit('leave', { room: roomname });
+      socket.emit('leave', { room: roomname, username: username });
+      navigator.sendBeacon("/user-left");
     });
-</script>
-
-
+  </script>
 </body>
 </html>
