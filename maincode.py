@@ -102,6 +102,7 @@ def lobby(roomname):
     usernames = [user["username"] for user in user_response.data] if user_response.data else []
     auto_refresh = len(usernames) < 4
 
+    html = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@main/lobby.html").text
     return render_template_string(html, roomname=roomname, password=room_password,
                                   p1=usernames[0] if len(usernames) > 0 else None,
                                   p2=usernames[1] if len(usernames) > 1 else None,
