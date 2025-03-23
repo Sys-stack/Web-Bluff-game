@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, render_template_string, make_response
+from flask import Flask, request, redirect, url_for, render_template_string, make_response, jsonify
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import requests
 from supabase import create_client, Client
@@ -114,11 +114,28 @@ def lobby(roomname):
 
     html = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@main/lobby.html").text
 
+    # Fill player slots with current users or "None"
     return render_template_string(html, roomname=roomname, password=room_password,
                                   p1=usernames[0] if len(usernames) > 0 else "None",
                                   p2=usernames[1] if len(usernames) > 1 else "None",
                                   p3=usernames[2] if len(usernames) > 2 else "None",
                                   p4=usernames[3] if len(usernames) > 3 else "None")
+
+# Add an API endpoint to get updated player lists
+@app.route("/api/room/<roomname>/players")
+def get_room_players(roomname):
+    user_response = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
+    usernames = [user["username"] for user in user_response.data] if user_response.data else []
+    
+    # Ensure we have 4 slots, filling with None as needed
+    players = {
+        "p1": usernames[0] if len(usernames) > 0 else "None",
+        "p2": usernames[1] if len(usernames) > 1 else "None",
+        "p3": usernames[2] if len(usernames) > 2 else "None",
+        "p4": usernames[3] if len(usernames) > 3 else "None"
+    }
+    
+    return jsonify(players)
 
 @app.route("/oldroom", methods=["GET", "POST"])
 def oldroom():
@@ -170,10 +187,20 @@ def user_left():
         if roomname in active_rooms:
             del active_rooms[roomname]
 
-    # Broadcast the updated user list to all clients in the room
+    # Get fresh user data from the database
     user_response = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
     usernames = [user["username"] for user in user_response.data] if user_response.data else []
-    socketio.emit('update_users', usernames, room=roomname)
+    
+    # Format player list in the way the client expects
+    players = {
+        "p1": usernames[0] if len(usernames) > 0 else "None",
+        "p2": usernames[1] if len(usernames) > 1 else "None",
+        "p3": usernames[2] if len(usernames) > 2 else "None",
+        "p4": usernames[3] if len(usernames) > 3 else "None"
+    }
+    
+    # Broadcast the updated user list to all clients in the room
+    socketio.emit('update_players', players, room=roomname)
 
     return "User and possibly empty room removed", 200
 
@@ -203,8 +230,16 @@ def handle_join(data):
     # Update the active_rooms dictionary
     active_rooms[roomname] = usernames[:4]
     
+    # Format player list in the way the client expects
+    players = {
+        "p1": usernames[0] if len(usernames) > 0 else "None",
+        "p2": usernames[1] if len(usernames) > 1 else "None",
+        "p3": usernames[2] if len(usernames) > 2 else "None",
+        "p4": usernames[3] if len(usernames) > 3 else "None"
+    }
+    
     # Broadcast the updated user list to all clients in the room
-    emit('update_users', usernames, room=roomname)
+    emit('update_players', players, room=roomname)
 
 @socketio.on('leave')
 def handle_leave(data):
@@ -233,10 +268,20 @@ def handle_leave(data):
         if roomname in active_rooms:
             del active_rooms[roomname]
     
-    # Get the updated list of users and broadcast it
+    # Get the updated list of users
     updated = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
     usernames = [user["username"] for user in updated.data] if updated.data else []
-    emit('update_users', usernames, room=roomname)
+    
+    # Format player list in the way the client expects
+    players = {
+        "p1": usernames[0] if len(usernames) > 0 else "None",
+        "p2": usernames[1] if len(usernames) > 1 else "None",
+        "p3": usernames[2] if len(usernames) > 2 else "None",
+        "p4": usernames[3] if len(usernames) > 3 else "None"
+    }
+    
+    # Broadcast the updated player list to all clients in the room
+    emit('update_players', players, room=roomname)
 
 @socketio.on('disconnect')
 def handle_disconnect():
