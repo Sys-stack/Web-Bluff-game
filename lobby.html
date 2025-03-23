@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  {% if auto_refresh %}
-  <meta http-equiv="refresh" content="5">
-  {% endif %}
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bluff Game</title>
@@ -164,5 +160,11 @@
             <button class = 'mainbutton' name = 'action' value = 'play'> PLAY </button>
             </form>
         </div>
+  <script>
+    window.addEventListener("beforeunload", function () {
+        navigator.sendBeacon("/user-left");
+    });
+</script>
+
 </body>
 </html>
