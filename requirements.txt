@@ -4,3 +4,4 @@ gunicorn
 supabase
 flask-socketio
 python-socketio
+eventlet
