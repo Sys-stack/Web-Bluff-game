@@ -147,6 +147,29 @@ def oldroom():
     page = requests.get(oldroom_github_html).text
 
     return render_template_string(page)  # Optionally pass error=error_message if used in HTML
+@app.route("/user-left", methods=["POST"])
+def user_left():
+    user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+
+    # Get the roomname before deleting the user
+    user_entry = supabase.table("userinfo").select("roomname").eq("ip", user_ip).single().execute()
+    if not user_entry.data:
+        return "User not found", 404
+
+    roomname = user_entry.data["roomname"]
+
+    # Delete user from userinfo
+    supabase.table("userinfo").delete().eq("ip", user_ip).execute()
+
+    # Check if anyone is still in the room
+    remaining_users = supabase.table("userinfo").select("ip").eq("roomname", roomname).execute()
+
+    if not remaining_users.data:
+        # No one left in the room, delete it
+        supabase.table("rooms").delete().eq("name", roomname).execute()
+        print(f"Room '{roomname}' deleted as it became empty.")
+
+    return "User and empty room (if any) removed", 200
 
 
 if __name__ == "__main__":
