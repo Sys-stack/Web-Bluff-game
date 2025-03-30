@@ -46,18 +46,21 @@ def rooms():
     elif roomaction == "oldroom":
         return redirect(url_for("oldroom"))
 
-    username = request.form.get("username")
+    if request.form.get("username"):
+        username = request.form.get("username")
+    else:
+        username = "Username"
     color = request.form.get("color")
 
-    html = requests.get("https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/main/rooms.html").text
+    html = requests.get("https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/main/rooms.html")
 
-    if username:
+    if request.form.get("username"):
         resp = make_response(html)
         resp.set_cookie("username", username, max_age=60 * 60 * 24)
         resp.set_cookie("color", color or "#ffffff", max_age=60 * 60 * 24)
-        return resp
+        return render_template_string(html.text, username = username)
 
-    return html
+    return html.text
 
 @app.route("/newroom", methods=["GET", "POST"])
 def newroom():
