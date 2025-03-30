@@ -1,5 +1,4 @@
 from flask import Flask, request, redirect, url_for, render_template_string, make_response, jsonify
-from flask_socketio import SocketIO, emit, join_room, leave_room
 import requests
 from supabase import create_client, Client
 import os
