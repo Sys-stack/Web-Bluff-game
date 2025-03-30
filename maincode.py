@@ -11,9 +11,6 @@ import os
 url = os.environ.get("supabase_url")
 key = os.environ.get("supabase_api")
 
-if not url or not key:
-    raise Exception("Supabase URL or API key not set in environment variables.")
-
 supabase: Client = create_client(url, key)
 
 # ------------------------
@@ -23,9 +20,6 @@ supabase: Client = create_client(url, key)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'  # Add a secret key for security
 socketio = SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')  # Specify async_mode
-
-# Dictionary to track active rooms and users for quick access
-active_rooms = {}
 
 # ------------------------
 # ROUTES
@@ -121,21 +115,7 @@ def lobby(roomname):
                                   p3=usernames[2] if len(usernames) > 2 else "None",
                                   p4=usernames[3] if len(usernames) > 3 else "None")
 
-# Add an API endpoint to get updated player lists
-@app.route("/api/room/<roomname>/players")
-def get_room_players(roomname):
-    user_response = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
-    usernames = [user["username"] for user in user_response.data] if user_response.data else []
-    
-    # Ensure we have 4 slots, filling with None as needed
-    players = {
-        "p1": usernames[0] if len(usernames) > 0 else "None",
-        "p2": usernames[1] if len(usernames) > 1 else "None",
-        "p3": usernames[2] if len(usernames) > 2 else "None",
-        "p4": usernames[3] if len(usernames) > 3 else "None"
-    }
-    
-    return jsonify(players)
+
 
 @app.route("/oldroom", methods=["GET", "POST"])
 def oldroom():
@@ -164,137 +144,5 @@ def oldroom():
     page = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/oldroom.html").text
     return render_template_string(page)
 
-@app.route("/user-left", methods=["POST"])
-def user_left():
-    user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    user_entry = supabase.table("userinfo").select("roomname, username").eq("ip", user_ip).single().execute()
-
-    if not user_entry.data:
-        return "User not found", 404
-
-    roomname = user_entry.data["roomname"]
-    username = user_entry.data["username"]
-    
-    supabase.table("userinfo").delete().eq("ip", user_ip).execute()
-
-    # Update the active_rooms dictionary
-    if roomname in active_rooms and username in active_rooms[roomname]:
-        active_rooms[roomname].remove(username)
-
-    remaining = supabase.table("userinfo").select("ip").eq("roomname", roomname).execute()
-    if not remaining.data:
-        supabase.table("rooms").delete().eq("name", roomname).execute()
-        if roomname in active_rooms:
-            del active_rooms[roomname]
-
-    # Get fresh user data from the database
-    user_response = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
-    usernames = [user["username"] for user in user_response.data] if user_response.data else []
-    
-    # Format player list in the way the client expects
-    players = {
-        "p1": usernames[0] if len(usernames) > 0 else "None",
-        "p2": usernames[1] if len(usernames) > 1 else "None",
-        "p3": usernames[2] if len(usernames) > 2 else "None",
-        "p4": usernames[3] if len(usernames) > 3 else "None"
-    }
-    
-    # Broadcast the updated user list to all clients in the room
-    socketio.emit('update_players', players, room=roomname)
-
-    return "User and possibly empty room removed", 200
-
-# ------------------------
-# SOCKET.IO EVENTS
-# ------------------------
-
-@socketio.on('connect')
-def handle_connect():
-    print("Client connected")
-
-@socketio.on('join')
-def handle_join(data):
-    username = data.get('username')
-    roomname = data.get('room')
-    
-    if not username or not roomname:
-        return
-    
-    join_room(roomname)
-    print(f"User {username} joined room: {roomname}")
-    
-    # Query the database for the current list of users in the room
-    user_response = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
-    usernames = [user["username"] for user in user_response.data] if user_response.data else []
-    
-    # Update the active_rooms dictionary
-    active_rooms[roomname] = usernames[:4]
-    
-    # Format player list in the way the client expects
-    players = {
-        "p1": usernames[0] if len(usernames) > 0 else "None",
-        "p2": usernames[1] if len(usernames) > 1 else "None",
-        "p3": usernames[2] if len(usernames) > 2 else "None",
-        "p4": usernames[3] if len(usernames) > 3 else "None"
-    }
-    
-    # Broadcast the updated user list to all clients in the room
-    emit('update_players', players, room=roomname)
-
-@socketio.on('leave')
-def handle_leave(data):
-    roomname = data.get('room')
-    username = data.get('username')
-    
-    if not username or not roomname:
-        return
-    
-    leave_room(roomname)
-    print(f"User {username} left room: {roomname}")
-
-    # Update the database
-    user_entry = supabase.table("userinfo").select("ip").eq("username", username).eq("roomname", roomname).execute()
-    if user_entry.data:
-        supabase.table("userinfo").delete().eq("ip", user_entry.data[0]["ip"]).execute()
-    
-    # Update the active_rooms dictionary
-    if roomname in active_rooms and username in active_rooms[roomname]:
-        active_rooms[roomname].remove(username)
-    
-    # Check if the room is now empty
-    remaining = supabase.table("userinfo").select("ip").eq("roomname", roomname).execute()
-    if not remaining.data:
-        supabase.table("rooms").delete().eq("name", roomname).execute()
-        if roomname in active_rooms:
-            del active_rooms[roomname]
-    
-    # Get the updated list of users
-    updated = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
-    usernames = [user["username"] for user in updated.data] if updated.data else []
-    
-    # Format player list in the way the client expects
-    players = {
-        "p1": usernames[0] if len(usernames) > 0 else "None",
-        "p2": usernames[1] if len(usernames) > 1 else "None",
-        "p3": usernames[2] if len(usernames) > 2 else "None",
-        "p4": usernames[3] if len(usernames) > 3 else "None"
-    }
-    
-    # Broadcast the updated player list to all clients in the room
-    emit('update_players', players, room=roomname)
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    print("Client disconnected")
-
-# ------------------------
-# RUN THE SERVER
-# ------------------------
-
-# Only run when executing directly
 if __name__ == "__main__":
-    import eventlet
-    import eventlet.wsgi
-    eventlet.monkey_patch()
-    
-    socketio.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+    app.run(debug=True)
