@@ -17,8 +17,6 @@ supabase: Client = create_client(url, key)
 # ------------------------
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key'  # Add a secret key for security
-socketio = SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')  # Specify async_mode
 
 # ------------------------
 # ROUTES
