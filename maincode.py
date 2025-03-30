@@ -103,9 +103,6 @@ def lobby(roomname):
     user_response = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
     usernames = [user["username"] for user in user_response.data] if user_response.data else []
 
-    # Update active_rooms dictionary for quick access during WebSocket operations
-    active_rooms[roomname] = usernames[:4]  # Limit to 4 players
-
     html = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@main/lobby.html").text
 
     # Fill player slots with current users or "None"
