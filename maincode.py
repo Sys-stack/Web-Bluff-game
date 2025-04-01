@@ -63,7 +63,7 @@ def rooms():
     if response.status_code != 200:
         return "Failed to load rooms page", 500
     
-    if request.form.get("username"):
+    if not (username == "Username"):
         resp = make_response(response.text)
         resp.set_cookie("username", username, max_age=60 * 60 * 24)
         resp.set_cookie("color", color, max_age=60 * 60 * 24)
