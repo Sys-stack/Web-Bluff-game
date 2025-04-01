@@ -56,7 +56,7 @@ def rooms():
     elif roomaction == "oldroom":
         return redirect(url_for("oldroom"))
     
-    username = request.form.get("username", "").strip() or "Username"
+    username = request.form.get("username") or "Username"
     color = request.form.get("color", "#ffffff")
     
     response = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/rooms.html")
