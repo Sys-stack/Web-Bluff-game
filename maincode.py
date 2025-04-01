@@ -6,7 +6,8 @@ import os
 import random
 import string
 import uuid
-
+import eventlet
+import eventlet.wsgi
 # ------------------------
 # Helper Function: Generate Unique ID
 # ------------------------
@@ -29,7 +30,7 @@ supabase: Client = create_client(url, key)
 # Flask App Initialization
 # ------------------------
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode="eventlet", cors_allowed_origins="*", ping_interval=25)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", os.urandom(24))  # Added secret key
 
 
@@ -270,5 +271,6 @@ def disconnection:
     
     send("disconnect_response", data, broadcast = True)
 
-if __name__ == "__main__":
-    socketio.run(app, debug=True)
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))  # Use Render's assigned port
+    socketio.run(app, host='0.0.0.0', port=port)
