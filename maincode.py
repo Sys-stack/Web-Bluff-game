@@ -195,8 +195,8 @@ def oldroom():
                 return "Invalid room name or password", 400
             
             # Check if room is full (max 4 players)
-            user_count = supabase.table("userinfo").select("*").eq("roomname", roomname).execute()
-            if len(user_count.data) >= 4:
+            user_count = supabase.table("userinfo").select("count").eq("roomname", roomname).execute()
+            if user_count.count >= 4:
                 return "Room is full", 400
             
             # Generate a unique user ID
@@ -215,6 +215,13 @@ def oldroom():
             return resp
         except Exception as e:
             return f"Error joining room: {str(e)}", 500
+    
+    try:
+        response = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/oldroom.html")
+        response.raise_for_status()
+        return render_template_string(response.text)
+    except requests.RequestException as e:
+        return f"Failed to load join room page: {str(e)}", 500
 
 @app.route("/leave_room")
 def leave_room():
@@ -250,9 +257,9 @@ def connection():
     user_id = request.cookies.get("user_id")
 
     print(f"{username} with ID of {user_id} has connected")
-    data = {"username": username, "user_id": user_id}
+    data = {"username":username, "user_id":user_id}
     
-    emit("connect_response", data, broadcast=True)
+    send("connect_response", data, broadcast = True)
 
 @socketio.on('disconnect')
 def disconnection():
@@ -260,11 +267,10 @@ def disconnection():
     user_id = request.cookies.get("user_id")
 
     print(f"{username} with ID of {user_id} has disconnected")
-    data = {"username": username, "user_id": user_id}
+    data = {"username":username, "user_id":user_id}
     
-    emit("disconnect_response", data, broadcast=True)
-    
+    send("disconnect_response", data, broadcast = True)
+
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    # Use eventlet's WSGI server
-    eventlet.wsgi.server(eventlet.listen(('0.0.0.0', port)), socketio.wsgi_app)
+    port = int(os.environ.get("PORT", 5000))  # Use Render's assigned port
+    socketio.run(app, host='0.0.0.0', port=port)
