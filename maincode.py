@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, url_for, render_template_string, make_response, jsonify
 import requests
+from flask_socketio import SocketIO, send, emit
 from supabase import create_client, Client
 import os
 import random
@@ -28,7 +29,9 @@ supabase: Client = create_client(url, key)
 # Flask App Initialization
 # ------------------------
 app = Flask(__name__)
+socketio = SocketIO(app)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", os.urandom(24))  # Added secret key
+
 
 # ------------------------
 # Routes
@@ -242,6 +245,30 @@ def leave_room():
         return resp
     
     return redirect(url_for("rooms"))
+    
+# ------------------------
+# SOCKETS
+# ------------------------
+
+@socketio.on('connect')
+def connection():
+    username = request.cookies.get("username")
+    user_id = request.cookies.get("user_id")
+
+    print(f"{username} with ID of {user_id} has connected")
+    data = {"username":username, "user_id":user_id}
+    
+    send("connect_response", data, broadcast = True)
+
+@socketio.on('disconnect')
+def disconnection:
+    username = request.cookies.get("username")
+    user_id = request.cookies.get("user_id")
+
+    print(f"{username} with ID of {user_id} has disconnected")
+    data = {"username":username, "user_id":user_id}
+    
+    send("disconnect_response", data, broadcast = True)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    socketio.run(app, debug=True)
