@@ -48,6 +48,11 @@ def home():
 def credits():
     return "<h2>Game Credits Page</h2>"
 
+from flask import Flask, request, redirect, url_for, make_response, render_template_string
+import requests
+
+app = Flask(__name__)
+
 @app.route("/rooms", methods=["POST", "GET"])
 def rooms():
     roomaction = request.form.get("action")
@@ -56,26 +61,24 @@ def rooms():
     elif roomaction == "oldroom":
         return redirect(url_for("oldroom"))
     
-    # Get 'username' and 'color' from form or set defaults
     username = request.form.get("username", "Username")
     color = request.form.get("color", "#ffffff")
-    
-    # Make the request to get the rooms page
+
+    # Fetch the HTML page
     response = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/rooms.html")
     if response.status_code != 200:
         return "Failed to load rooms page", 500
-    
-    # Check if the username is set (not the default value)
-    
-    resp = make_response(response.text)  # Create the response object
-    resp.set_cookie("username", username, max_age=60 * 60 * 24)  # Set username cookie
-    resp.set_cookie("color", color, max_age=60 * 60 * 24)  # Set color cookie
-        
-        # Return the response with cookies set
-        
-    
-    # If username is still the default, return the page without cookies
-    return render_template(response.text, username = (username or "Username"))
+
+    # Create response object with the fetched HTML
+    resp = make_response(response.text)
+
+    # Only set cookies if username is not the default
+    if username != "Username":
+        resp.set_cookie("username", username, max_age=60 * 60 * 24)
+        resp.set_cookie("color", color, max_age=60 * 60 * 24)
+
+    return resp  # Return the response
+
 
 @app.route("/newroom", methods=["GET", "POST"])
 def newroom():
