@@ -55,7 +55,7 @@ def rooms():
         return redirect(url_for("newroom"))
     elif roomaction == "oldroom":
         return redirect(url_for("oldroom"))
-    
+
     username = request.form.get("username", "Username")
     color = request.form.get("color", "#ffffff")
 
@@ -67,14 +67,13 @@ def rooms():
     # Create response object with the fetched HTML
     resp = make_response(response.text)
 
-    # Only set cookies if username is not the default
+    # Set cookies only if username is not the default
     if username != "Username":
         resp.set_cookie("username", username, max_age=60 * 60 * 24)
         resp.set_cookie("color", color, max_age=60 * 60 * 24)
-        return render_template_string(resp, username =(  username or "Username" ))# Return the response
 
-    return render_template_string(resp, username =(  username or "Username" ))# Return the response
-
+    # Render the HTML with username variable
+    return render_template_string(response.text, username=username)
 
 @app.route("/newroom", methods=["GET", "POST"])
 def newroom():
