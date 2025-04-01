@@ -56,20 +56,27 @@ def rooms():
     elif roomaction == "oldroom":
         return redirect(url_for("oldroom"))
     
-    username = request.form.get("username") or "Username"
+    # Get 'username' and 'color' from form or set defaults
+    username = request.form.get("username", "Username")
     color = request.form.get("color", "#ffffff")
     
+    # Make the request to get the rooms page
     response = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/rooms.html")
     if response.status_code != 200:
         return "Failed to load rooms page", 500
     
-    if not (username == "Username"):
-        resp = make_response(response.text)
-        resp.set_cookie("username", username, max_age=60 * 60 * 24)
-        resp.set_cookie("color", color, max_age=60 * 60 * 24)
+    # Check if the username is set (not the default value)
+    if username != "Username":
+        resp = make_response(response.text)  # Create the response object
+        resp.set_cookie("username", username, max_age=60 * 60 * 24)  # Set username cookie
+        resp.set_cookie("color", color, max_age=60 * 60 * 24)  # Set color cookie
+        
+        # Return the response with cookies set
         return render_template_string(response.text, username=username)
     
+    # If username is still the default, return the page without cookies
     return response.text
+
 
 @app.route("/newroom", methods=["GET", "POST"])
 def newroom():
