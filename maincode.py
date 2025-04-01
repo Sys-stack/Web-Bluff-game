@@ -259,7 +259,7 @@ def connection():
     print(f"{username} with ID of {user_id} has connected")
     data = {"username":username, "user_id":user_id}
     
-    send("connect_response", data, broadcast = True)
+    emit("connect_response", data, broadcast = True)
 
 @socketio.on('disconnect')
 def disconnection():
@@ -269,7 +269,7 @@ def disconnection():
     print(f"{username} with ID of {user_id} has disconnected")
     data = {"username":username, "user_id":user_id}
     
-    send("disconnect_response", data, broadcast = True)
+    emit("disconnect_response", data, broadcast = True)
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Use Render's assigned port
