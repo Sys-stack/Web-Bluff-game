@@ -83,7 +83,7 @@ def newroom():
     roomname = request.form.get("roomname")
     
     # Check if the username and color are set
-    if not username or not color:
+    if not username:
         return "Please set your profile before creating a room.", 400
     
     # Generate a unique user IP
