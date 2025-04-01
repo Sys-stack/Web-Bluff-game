@@ -48,11 +48,6 @@ def home():
 def credits():
     return "<h2>Game Credits Page</h2>"
 
-from flask import Flask, request, redirect, url_for, make_response, render_template_string
-import requests
-
-app = Flask(__name__)
-
 @app.route("/rooms", methods=["POST", "GET"])
 def rooms():
     roomaction = request.form.get("action")
@@ -77,7 +72,7 @@ def rooms():
         resp.set_cookie("username", username, max_age=60 * 60 * 24)
         resp.set_cookie("color", color, max_age=60 * 60 * 24)
 
-    return resp  # Return the response
+    return render_template_string(resp, username =(  username or "Username" ))# Return the response
 
 
 @app.route("/newroom", methods=["GET", "POST"])
@@ -117,6 +112,8 @@ def newroom():
     
     resp = make_response(response.text)
     resp.set_cookie("user_ip", user_ip, max_age=60 * 60 * 24)
+    if roomname and password:
+        return redirect(url_for("lobby", roomname = roomname))
     return render_template_string(response.text, password=password, roomname=roomname)
 
 @app.route("/room/<roomname>")
