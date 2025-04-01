@@ -66,16 +66,16 @@ def rooms():
         return "Failed to load rooms page", 500
     
     # Check if the username is set (not the default value)
-    if username != "Username":
-        resp = make_response(response.text)  # Create the response object
-        resp.set_cookie("username", username, max_age=60 * 60 * 24)  # Set username cookie
-        resp.set_cookie("color", color, max_age=60 * 60 * 24)  # Set color cookie
+    
+    resp = make_response(response.text)  # Create the response object
+    resp.set_cookie("username", username, max_age=60 * 60 * 24)  # Set username cookie
+    resp.set_cookie("color", color, max_age=60 * 60 * 24)  # Set color cookie
         
         # Return the response with cookies set
-        return render_template_string(response.text, username=username)
+        
     
     # If username is still the default, return the page without cookies
-    return response.text
+    return render_template(response.text, username = (username or "Username"))
 
 @app.route("/newroom", methods=["GET", "POST"])
 def newroom():
