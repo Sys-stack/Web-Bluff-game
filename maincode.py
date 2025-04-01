@@ -71,6 +71,7 @@ def rooms():
     if username != "Username":
         resp.set_cookie("username", username, max_age=60 * 60 * 24)
         resp.set_cookie("color", color, max_age=60 * 60 * 24)
+        return render_template_string(resp, username =(  username or "Username" ))# Return the response
 
     return render_template_string(resp, username =(  username or "Username" ))# Return the response
 
