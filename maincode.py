@@ -135,7 +135,7 @@ def newroom():
     except requests.RequestException as e:
         return f"Failed to load new room page: {str(e)}", 500
 
-@app.route("/room/<roomname>")
+@app.route("/room/<roomname>", methods = ["POST", "GET"])
 def lobby(roomname):
     user_id = request.cookies.get("user_id")
     if not user_id:
