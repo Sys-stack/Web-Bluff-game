@@ -77,7 +77,6 @@ def rooms():
     # If username is still the default, return the page without cookies
     return response.text
 
-
 @app.route("/newroom", methods=["GET", "POST"])
 def newroom():
     username = request.cookies.get("username")
@@ -85,7 +84,8 @@ def newroom():
     password = request.form.get("password")
     roomname = request.form.get("roomname")
     
-    if not username:
+    # Check if the username and color are set
+    if not username or not color:
         return "Please set your profile before creating a room.", 400
     
     # Generate a unique user IP
