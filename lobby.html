@@ -167,8 +167,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
   <script>
     // Initialize the WebSocket connection
-    var socket = io.connect('https://bluff-r48h.onrender.com/room/{{ roomname|safe }}:5000');
-
+    var socket = io.connect('https://bluff-r48h.onrender.com');
     // DOM element for connection status
     var connectionStatus = document.getElementById('connection-status');
 
