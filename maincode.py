@@ -262,7 +262,7 @@ def connection():
     send("connect_response", data, broadcast = True)
 
 @socketio.on('disconnect')
-def disconnection:
+def disconnection():
     username = request.cookies.get("username")
     user_id = request.cookies.get("user_id")
 
