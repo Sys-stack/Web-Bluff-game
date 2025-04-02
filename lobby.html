@@ -167,7 +167,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
   <script>
     // Initialize the WebSocket connection
-    var socket = io.connect('wss://bluff-r48h.onrender.com');
+    var socket = io.connect('https://bluff-r48h.onrender.com', {
+  path: '/socket.io',
+  transports: ['websocket', 'polling']
+});
     // DOM element for connection status
     var connectionStatus = document.getElementById('connection-status');
 
