@@ -253,24 +253,40 @@ def leave_room():
 
 @socketio.on('connect')
 def connection():
-    username = request.cookies.get("username")
-    user_id = request.cookies.get("user_id")
-
-    print(f"{username} with ID of {user_id} has connected")
-    data = {"username":username, "user_id":user_id}
-    
-    emit("connect_response", data, broadcast = True)
+    try:
+        if hasattr(request, 'cookies'):
+            username = request.cookies.get("username")
+            user_id = request.cookies.get("user_id")
+        else:
+            # Fall back to session data or connection data
+            username = "Unknown"
+            user_id = request.sid  # Socket.IO session ID
+            
+        print(f"{username} with ID of {user_id} has connected")
+        data = {"username": username, "user_id": user_id}
+        
+        # Make sure you're not creating an endless loop by emitting to all clients
+        emit("connect_response", data, broadcast=True, include_self=False)
+    except Exception as e:
+        print(f"Error in connection handler: {e}")
 
 @socketio.on('disconnect')
 def disconnection():
-    username = request.cookies.get("username")
-    user_id = request.cookies.get("user_id")
-
-    print(f"{username} with ID of {user_id} has disconnected")
-    data = {"username":username, "user_id":user_id}
-    
-    emit("disconnect_response", data, broadcast = True)
-
+    try:
+        if hasattr(request, 'cookies'):
+            username = request.cookies.get("username")
+            user_id = request.cookies.get("user_id")
+        else:
+            username = "Unknown"
+            user_id = request.sid
+            
+        print(f"{username} with ID of {user_id} has disconnected")
+        data = {"username": username, "user_id": user_id}
+        
+        emit("disconnect_response", data, broadcast=True, include_self=False)
+    except Exception as e:
+        print(f"Error in disconnection handler: {e}")
+        
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Use Render's assigned port
     socketio.run(app, host='0.0.0.0', port=port)
