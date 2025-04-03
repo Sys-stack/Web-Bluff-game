@@ -165,25 +165,25 @@ def oldroom():
     color = request.cookies.get("color")
     if not username or not color:
         return redirect(url_for("rooms"))
-    
+
     roomname = request.form.get("roomname")
     password = request.form.get("password")
-    
+
     if request.method == "POST" and roomname and password:
         try:
             # Check if room exists and password matches
             room_data = supabase.table("rooms").select("*").eq("name", roomname).execute()
-            if not (room_data.data or (room_data.data[0]["password"] != password)):
+            if not room_data.data or room_data.data[0]["password"] != password:
                 return "Invalid room name or password", 400
-            
+
             # Check if room is full (max 4 players)
-            user_count = supabase.table("userinfo").select("count").eq("roomname", roomname).execute()
-            if len(user_count) >= 4:
+            user_count = supabase.table("userinfo").select("*").eq("roomname", roomname).execute()
+            if len(user_count.data) >= 4:
                 return "Room is full", 400
-            
+
             # Generate a unique user ID
             user_id = generate_unique_id()
-            
+
             # Save user info
             supabase.table("userinfo").insert({
                 "ip": user_id,
@@ -191,13 +191,13 @@ def oldroom():
                 "color": color,
                 "roomname": roomname
             }).execute()
-            
+
             resp = make_response(redirect(url_for("lobby", roomname=roomname)))
             resp.set_cookie("user_id", user_id, max_age=60 * 60 * 24, httponly=True)
             return resp
         except Exception as e:
             return f"Error joining room: {str(e)}", 500
-    
+
         
     return render_template("oldroom.html")
   
