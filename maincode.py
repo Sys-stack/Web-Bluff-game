@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()  # Add this at the top before any other imports
+import eventlet.wsgi
 from flask import Flask, request, redirect, url_for, render_template, make_response, jsonify
 import requests
 from flask_socketio import SocketIO, send, emit
@@ -6,8 +9,8 @@ import os
 import random
 import string
 import uuid
-import eventlet
-import eventlet.wsgi
+
+
 # ------------------------
 # Helper Function: Generate Unique ID
 # ------------------------
