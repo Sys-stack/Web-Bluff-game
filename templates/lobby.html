@@ -177,16 +177,26 @@
     // Display connection status
     socket.on('connect', function() {
       connectionStatus.textContent = "WebSocket: Connected";
-      
+      connectionStatus.classList.remove("disconnected");
+      connectionStatus.classList.add("connected");
     });
 
     // Handle disconnection
     socket.on('disconnect', function() {
       connectionStatus.textContent = "WebSocket: Disconnected";
-      
+      connectionStatus.classList.remove("connected");
+      connectionStatus.classList.add("disconnected");
     });
 
-    
+    // Listen for other events such as when someone connects or disconnects
+    socket.on('connect_response', function(data) {
+      console.log(data.username + ' has connected');
+      // Update the frontend with the new user info if needed
+    });
+
+    socket.on('disconnect_response', function(data) {
+      console.log(data.username + ' has disconnected');
+      // Update the frontend with the user info who disconnected
     });
   </script>
 </body>
