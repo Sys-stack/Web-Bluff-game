@@ -46,12 +46,7 @@ def home():
     elif action == "about":
         return redirect(url_for("credits"))
     
-    try:
-        response = requests.get("https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/main/Bluff.html")
-        response.raise_for_status()  # Raise exception for HTTP errors
-        return response.text
-    except requests.RequestException as e:
-        return f"Failed to load home page: {str(e)}", 500
+    return render_template("bluff.html")
 
 @app.route("/credits")
 def credits():
@@ -68,22 +63,15 @@ def rooms():
     username = request.form.get("username", "Username")
     color = request.form.get("color", "#ffffff")
 
-    try:
-        # Fetch the HTML page
-        response = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/rooms.html")
-        response.raise_for_status()
-        
-        # Create response object with the fetched HTML
-        resp = make_response(render_template_string(response.text, username=username))
+
+    resp = make_response(render_template("rooms.html", username=username))
         
         # Set cookies only if username is not the default
-        if username != "Username":
-            resp.set_cookie("username", username, max_age=60 * 60 * 24, httponly=True)
-            resp.set_cookie("color", color, max_age=60 * 60 * 24, httponly=True)
+    if username != "Username":
+        resp.set_cookie("username", username, max_age=60 * 60 * 24, httponly=True)
+        resp.set_cookie("color", color, max_age=60 * 60 * 24, httponly=True)
         
-        return resp
-    except requests.RequestException as e:
-        return f"Failed to load rooms page: {str(e)}", 500
+    return resp
 
 @app.route("/newroom", methods=["GET", "POST"])
 def newroom():
@@ -128,12 +116,8 @@ def newroom():
         except Exception as e:
             return f"Error creating room: {str(e)}", 500
     
-    try:
-        response = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/newroom.html")
-        response.raise_for_status()
-        return render_template_string(response.text, password=password, roomname=roomname)
-    except requests.RequestException as e:
-        return f"Failed to load new room page: {str(e)}", 500
+    return render_template("newroom.html", password=password, roomname=roomname)
+    
 
 @app.route("/room/<roomname>", methods = ["POST", "GET"])
 def lobby(roomname):
@@ -141,32 +125,29 @@ def lobby(roomname):
     if not user_id:
         return redirect(url_for("rooms"))
     
-    try:
         # Check if room exists
-        room_response = supabase.table("rooms").select("password").eq("name", roomname).single().execute()
-        if not room_response.data:
-            return "Room not found", 404
+    room_response = supabase.table("rooms").select("password").eq("name", roomname).single().execute()
+    if not room_response.data:
+        return "Room not found", 404
         
         # Check if user is part of this room
-        user_check = supabase.table("userinfo").select("*").eq("ip", user_id).eq("roomname", roomname).execute()
-        if not user_check.data:
-            return "You don't have access to this room", 403
+    user_check = supabase.table("userinfo").select("*").eq("ip", user_id).eq("roomname", roomname).execute()
+    if not user_check.data:
+        return "You don't have access to this room", 403
         
-        room_password = room_response.data.get("password")
-        user_response = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
+    room_password = room_response.data.get("password")
+    user_response = supabase.table("userinfo").select("username").eq("roomname", roomname).execute()
         
         # Limit to 4 players
-        usernames = [user["username"] for user in user_response.data[:4]] if user_response.data else []
+    usernames = [user["username"] for user in user_response.data[:4]] if user_response.data else []
         
         # Fill remaining slots with "None"
-        while len(usernames) < 4:
-            usernames.append("None")
+    while len(usernames) < 4:
+        usernames.append("None")
         
-        html_response = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@main/lobby.html")
-        html_response.raise_for_status()
         
-        return render_template_string(
-            html_response.text, 
+    return render_template(
+            "lobby.html", 
             roomname=roomname, 
             password=room_password,
             p1=usernames[0],
@@ -174,8 +155,6 @@ def lobby(roomname):
             p3=usernames[2],
             p4=usernames[3]
         )
-    except Exception as e:
-        return f"Error loading lobby: {str(e)}", 500
 
 @app.route("/oldroom", methods=["GET", "POST"])
 def oldroom():
@@ -216,12 +195,9 @@ def oldroom():
         except Exception as e:
             return f"Error joining room: {str(e)}", 500
     
-    try:
-        response = requests.get("https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@latest/oldroom.html")
-        response.raise_for_status()
-        return render_template_string(response.text)
-    except requests.RequestException as e:
-        return f"Failed to load join room page: {str(e)}", 500
+        
+    return render_template("oldroom.html")
+  
 
 @app.route("/leave_room")
 def leave_room():
