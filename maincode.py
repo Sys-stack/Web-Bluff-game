@@ -173,12 +173,12 @@ def oldroom():
         try:
             # Check if room exists and password matches
             room_data = supabase.table("rooms").select("*").eq("name", roomname).execute()
-            if not room_data.data or room_data.data[0]["password"] != password:
+            if not (room_data.data or (room_data.data[0]["password"] != password)):
                 return "Invalid room name or password", 400
             
             # Check if room is full (max 4 players)
             user_count = supabase.table("userinfo").select("count").eq("roomname", roomname).execute()
-            if user_count.count >= 4:
+            if len(user_count) >= 4:
                 return "Room is full", 400
             
             # Generate a unique user ID
