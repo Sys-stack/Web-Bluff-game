@@ -135,6 +135,25 @@
       margin-bottom: 15px;
     }
 
+    .connection-status {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .connected {
+      background-color: green;
+      color: white;
+    }
+
+    .disconnected {
+      background-color: red;
+      color: white;
+    }
+
     @media screen and (max-width: 768px) {
       .mainmenu {
         flex-direction: column;
@@ -142,17 +161,20 @@
       }
     }
     
-
+    text {
+      display: block;
+      margin-bottom: 5px;
+    }
   </style>
 </head>
 <body>
   <div id="connection-status" class="connection-status disconnected">WebSocket: Disconnected</div>
   <h1 class="game-title"><u>LOBBY</u></h1>
   <div class="menuitems">
-    <form action="/newroom" method="POST">
+    <form action="/play" method="POST" id="roomForm">
       <h2 class="game-title1">ROOM INFO</h2><br>
-      <text>Roomname: {{roomname}}</text><br>
-      <text>Password: {{password}}</text><br>
+      <text>Roomname: <span id="room-name">{{ roomname }}</span></text><br>
+      <text>Password: <span id="room-password">{{ password }}</span></text><br>
 
       <h2 class="game-title1">MEMBERS</h2><br>
       <text class="player-item">○ <span id="p1">{{ p1 }}</span></text><br>
@@ -160,44 +182,100 @@
       <text class="player-item">○ <span id="p3">{{ p3 }}</span></text><br>
       <text class="player-item">○ <span id="p4">{{ p4 }}</span></text><br><br>
 
-      <button class="mainbutton" name="action" value="play">PLAY</button>
+      <input type="hidden" name="roomname" value="{{ roomname }}">
+      <button type="button" class="mainbutton" id="playButton">PLAY</button>
     </form>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
   <script>
-    // Initialize the WebSocket connection
-    var socket = io.connect('https://bluff-r48h.onrender.com', {
-  path: '/socket.io',
-  transports: ['websocket', 'polling']
-});
-    // DOM element for connection status
-    var connectionStatus = document.getElementById('connection-status');
+    // DOM elements
+    const connectionStatus = document.getElementById('connection-status');
+    const playButton = document.getElementById('playButton');
+    const roomForm = document.getElementById('roomForm');
+    const roomName = document.getElementById('room-name').textContent.trim();
+    
+    // Player elements
+    const playerElements = {
+      p1: document.getElementById('p1'),
+      p2: document.getElementById('p2'),
+      p3: document.getElementById('p3'),
+      p4: document.getElementById('p4')
+    };
 
-    // Display connection status
+    // Initialize Socket.IO with same-origin URL
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const socketURL = `${protocol}//${window.location.host}`;
+    const socket = io(socketURL);
+    
+    // Handle connection events
     socket.on('connect', function() {
       connectionStatus.textContent = "WebSocket: Connected";
       connectionStatus.classList.remove("disconnected");
       connectionStatus.classList.add("connected");
+      
+      // Join the specific room namespace
+      socket.emit('join', { room: roomName });
     });
 
-    // Handle disconnection
     socket.on('disconnect', function() {
       connectionStatus.textContent = "WebSocket: Disconnected";
       connectionStatus.classList.remove("connected");
       connectionStatus.classList.add("disconnected");
     });
 
-    // Listen for other events such as when someone connects or disconnects
+    // Handle user connection/disconnection events
     socket.on('connect_response', function(data) {
       console.log(data.username + ' has connected');
-      // Update the frontend with the new user info if needed
+      updatePlayersList();
     });
 
     socket.on('disconnect_response', function(data) {
       console.log(data.username + ' has disconnected');
-      // Update the frontend with the user info who disconnected
+      updatePlayersList();
     });
+
+    // Update players when receiving updated player data
+    socket.on('player_update', function(data) {
+      if (data.players && Array.isArray(data.players)) {
+        for (let i = 0; i < data.players.length && i < 4; i++) {
+          const playerKey = `p${i+1}`;
+          if (playerElements[playerKey]) {
+            playerElements[playerKey].textContent = data.players[i] || "None";
+          }
+        }
+      }
+    });
+
+    // Request updated player list from server
+    function updatePlayersList() {
+      socket.emit('get_players', { room: roomName });
+    }
+
+    // Handle play button click
+    playButton.addEventListener('click', function() {
+      // Check if enough players are in the room (at least 2 players)
+      let playerCount = 0;
+      for (const key in playerElements) {
+        if (playerElements[key].textContent && playerElements[key].textContent !== "None") {
+          playerCount++;
+        }
+      }
+
+      if (playerCount < 2) {
+        alert("You need at least 2 players to start the game!");
+        return;
+      }
+
+      // Emit start game event
+      socket.emit('start_game', { room: roomName });
+      
+      // Submit the form
+      roomForm.submit();
+    });
+
+    // Initial player list request
+    updatePlayersList();
   </script>
 </body>
 </html>
