@@ -173,19 +173,49 @@
 });
     // DOM element for connection status
     var connectionStatus = document.getElementById('connection-status');
-
+    var P1 = document.getElementById("p1")
+    var P2 = document.getElementById("p2")
+    var P3 = document.getElementById("p3")
+    var P4 = document.getElementById("p4")
     // Display connection status
-    socket.on('connect', function() {
+    socket.on('connect', function(data) {
       connectionStatus.textContent = "WebSocket: Connected";
       connectionStatus.classList.remove("disconnected");
       connectionStatus.classList.add("connected");
+
+      if (data.userlabel == "p1") {
+        P1.textContent = data.username
+      }
+      if (data.userlabel == "p2") {
+        P2.textContent = data.username
+      }
+      if (data.userlabel == "p3") {
+        P3.textContent = data.username
+      }
+      if (data.userlabel == "p4") {
+        P4.textContent = data.username
+      }
+
     });
 
     // Handle disconnection
-    socket.on('disconnect', function() {
+    socket.on('disconnect', function(data) {
       connectionStatus.textContent = "WebSocket: Disconnected";
       connectionStatus.classList.remove("connected");
       connectionStatus.classList.add("disconnected");
+
+      if (data.userlabel == "p1") {
+        P1.textContent = "None"
+      }
+      if (data.userlabel == "p2") {
+        P2.textContent = "None"
+      }
+      if (data.userlabel == "p3") {
+        P3.textContent = "None"
+      }
+      if (data.userlabel == "p4") {
+        P4.textContent = "None"
+      }
     });
 
     // Listen for other events such as when someone connects or disconnects
