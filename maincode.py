@@ -232,14 +232,14 @@ def connection():
         if hasattr(request, 'cookies'):
             username = request.cookies.get("username")
             user_id = request.cookies.get("user_id")
-            userindex = usernames.index(username)
-            
-            userlabeldict = {0:"p1",
-                           1:"p2",
-                           2:"p3",
-                           3:"p4"}
+            roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
+            user_data = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
+            usernames_list = [user["username"] for user in user_data]
 
+            userindex = usernames_list.index(username)
+            userlabeldict = {0:"p1", 1:"p2", 2:"p3", 3:"p4"}
             userlabel = userlabeldict[userindex]
+
         else:
             # Fall back to session data or connection data
             username = "Unknown"
@@ -259,14 +259,14 @@ def disconnection():
         if hasattr(request, 'cookies'):
             username = request.cookies.get("username")
             user_id = request.cookies.get("user_id")
-            userindex = usernames.index(username)
-            
-            userlabeldict = {0:"p1",
-                           1:"p2",
-                           2:"p3",
-                           3:"p4"}
+            roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
+            user_data = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
+            usernames_list = [user["username"] for user in user_data]
 
+            userindex = usernames_list.index(username)
+            userlabeldict = {0:"p1", 1:"p2", 2:"p3", 3:"p4"}
             userlabel = userlabeldict[userindex]
+
         else:
             username = "Unknown"
             user_id = request.sid
