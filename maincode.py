@@ -17,7 +17,7 @@ import uuid
 def generate_unique_id():
     """Generate a unique ID using UUID4 (more collision-resistant than 4 characters)"""
     return str(uuid.uuid4())[:8]  # Using first 8 chars of UUID for readability
-
+usernames = []
 # ------------------------
 # Supabase Setup
 # ------------------------
@@ -236,13 +236,21 @@ def connection():
         if hasattr(request, 'cookies'):
             username = request.cookies.get("username")
             user_id = request.cookies.get("user_id")
+            userindex = usernames.index(username)
+            
+            userlabeldict {0:"p1",
+                           1:"p2",
+                           2:"p3",
+                           3:"p4"}
+
+            userlabel = userlabeldict[userindex]
         else:
             # Fall back to session data or connection data
             username = "Unknown"
             user_id = request.sid  # Socket.IO session ID
             
         print(f"{username} with ID of {user_id} has connected")
-        data = {"username": username, "user_id": user_id}
+        data = {"username": username, "user_id": user_id, "userlabel": userlabel}
         
         # Make sure you're not creating an endless loop by emitting to all clients
         emit("connect_response", data, broadcast=True, include_self=False)
@@ -255,12 +263,20 @@ def disconnection():
         if hasattr(request, 'cookies'):
             username = request.cookies.get("username")
             user_id = request.cookies.get("user_id")
+            userindex = usernames.index(username)
+            
+            userlabeldict {0:"p1",
+                           1:"p2",
+                           2:"p3",
+                           3:"p4"}
+
+            userlabel = userlabeldict[userindex]
         else:
             username = "Unknown"
             user_id = request.sid
             
         print(f"{username} with ID of {user_id} has disconnected")
-        data = {"username": username, "user_id": user_id}
+        data = {"username": username, "user_id": user_id, "userlabel": userlabel}
         
         emit("disconnect_response", data, broadcast=True, include_self=False)
     except Exception as e:
