@@ -3,7 +3,7 @@ eventlet.monkey_patch()  # Add this at the top before any other imports
 import eventlet.wsgi
 from flask import Flask, request, redirect, url_for, render_template, make_response, jsonify
 import requests
-from flask_socketio import SocketIO, send, emit
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from supabase import create_client, Client
 import os
 import random
@@ -239,17 +239,17 @@ def connection():
             userindex = usernames_list.index(username)
             userlabeldict = {0:"p1", 1:"p2", 2:"p3", 3:"p4"}
             userlabel = userlabeldict[userindex]
-
+            join_room(roomname)
         else:
             # Fall back to session data or connection data
             username = "Unknown"
             user_id = request.sid  # Socket.IO session ID
-            
+        
         print(f"{username} with ID of {user_id} has connected")
         data = {"username": username, "user_id": user_id, "userlabel": userlabel}
         
         # Make sure you're not creating an endless loop by emitting to all clients
-        emit("connect_response", data, broadcast=True, include_self=False)
+        emit("connect_response", data, to=roomname)
     except Exception as e:
         print(f"Error in connection handler: {e}")
 
@@ -266,7 +266,7 @@ def disconnection():
             userindex = usernames_list.index(username)
             userlabeldict = {0:"p1", 1:"p2", 2:"p3", 3:"p4"}
             userlabel = userlabeldict[userindex]
-
+            leave_room(roomname)
         else:
             username = "Unknown"
             user_id = request.sid
@@ -274,7 +274,7 @@ def disconnection():
         print(f"{username} with ID of {user_id} has disconnected")
         data = {"username": username, "user_id": user_id, "userlabel": userlabel}
         
-        emit("disconnect_response", data, broadcast=True, include_self=False)
+        emit("disconnect_response", data, to=roomname)
     except Exception as e:
         print(f"Error in disconnection handler: {e}")
         
