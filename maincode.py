@@ -234,7 +234,7 @@ def connection():
             user_id = request.cookies.get("user_id")
             userindex = usernames.index(username)
             
-            userlabeldict {0:"p1",
+            userlabeldict = {0:"p1",
                            1:"p2",
                            2:"p3",
                            3:"p4"}
@@ -261,7 +261,7 @@ def disconnection():
             user_id = request.cookies.get("user_id")
             userindex = usernames.index(username)
             
-            userlabeldict {0:"p1",
+            userlabeldict = {0:"p1",
                            1:"p2",
                            2:"p3",
                            3:"p4"}
