@@ -246,7 +246,7 @@ def connection():
             user_id = request.sid  # Socket.IO session ID
         
         print(f"{username} with ID of {user_id} has connected")
-        data = {"username": username, "user_id": user_id, "userlabel": userlabel}
+        data = {"username": username, "user_id": user_id, "userlist": usernames_list}
         
         # Make sure you're not creating an endless loop by emitting to all clients
         emit("connect_response", data, to=roomname)
@@ -274,7 +274,7 @@ def disconnection():
             user_id = request.sid
             
         print(f"{username} with ID of {user_id} has disconnected")
-        data = {"username": username, "user_id": user_id, "userlabel": userlabel}
+        data = {"username": username, "user_id": user_id, "userlist": usernames_list}
         
         emit("disconnect_response", data, to=roomname)
     except Exception as e:
