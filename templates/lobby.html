@@ -197,36 +197,23 @@
 
     // Listen for other events such as when someone connects or disconnects
     socket.on('connect_response', function(data) {
-      if (data.userlabel == "p1") {
-        P1.textContent = data.username
-      }
-      if (data.userlabel == "p2") {
-        P2.textContent = data.username
-      }
-      if (data.userlabel == "p3") {
-        P3.textContent = data.username
-      }
-      if (data.userlabel == "p4") {
-        P4.textContent = data.username
-      }
+      P1.textContent = data.userlist.p1;
+      P2.textContent = data.userlist.p2;
+      P3.textContent = data.userlist.p3;
+      P4.textContent = data.userlist.p4;
+
+
+
       console.log(data.username + ' has connected');
       // Update the frontend with the new user info if needed
     });
 
     socket.on('disconnect_response', function(data) {
       
-      if (data.userlabel == "p1") {
-        P1.textContent = "None"
-      }
-      if (data.userlabel == "p2") {
-        P2.textContent = "None"
-      }
-      if (data.userlabel == "p3") {
-        P3.textContent = "None"
-      }
-      if (data.userlabel == "p4") {
-        P4.textContent = "None"
-        }
+      P1.textContent = data.userlist.p1;
+      P2.textContent = data.userlist.p2;
+      P3.textContent = data.userlist.p3;
+      P4.textContent = data.userlist.p4;
       console.log(data.username + ' has disconnected');
       // Update the frontend with the user info who disconnected
     });
