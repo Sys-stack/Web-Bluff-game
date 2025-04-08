@@ -244,9 +244,9 @@ def connection():
             # Fall back to session data or connection data
             username = "Unknown"
             user_id = request.sid  # Socket.IO session ID
-        
+            userlabeldict = {"p1":"Waiting...","p2":"Waiting...","p3":"Waiting...","p4":"Waiting..."}
         print(f"{username} with ID of {user_id} has connected")
-        data = {"username": username, "user_id": user_id, "userlist": usernames_list}
+        data = {"username": username, "user_id": user_id, "userlist": userlabeldict}
         
         # Make sure you're not creating an endless loop by emitting to all clients
         emit("connect_response", data, to=roomname)
@@ -260,7 +260,7 @@ def disconnection():
             username = request.cookies.get("username")
             user_id = request.cookies.get("user_id")
             roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
-            delete = supabase.table("userinfo").delete().eq("roomname", roomname).execute()
+            delete = supabase.table("userinfo").delete().eq("ip", user_id).execute()
             user_data = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
             usernames_list = [user["username"] for user in user_data]
             while len(usernames_list)<=4:
@@ -272,9 +272,10 @@ def disconnection():
         else:
             username = "Unknown"
             user_id = request.sid
+            userlabeldict = {"p1":"Waiting...","p2":"Waiting...","p3":"Waiting...","p4":"Waiting..."}
             
         print(f"{username} with ID of {user_id} has disconnected")
-        data = {"username": username, "user_id": user_id, "userlist": usernames_list}
+        data = {"username": username, "user_id": user_id, "userlist": userlabeldict}
         
         emit("disconnect_response", data, to=roomname)
     except Exception as e:
