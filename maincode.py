@@ -152,11 +152,7 @@ def lobby(roomname):
     return render_template(
             "lobby.html", 
             roomname=roomname, 
-            password=room_password,
-            p1=usernames[0],
-            p2=usernames[1],
-            p3=usernames[2],
-            p4=usernames[3]
+            password=room_password
         )
 
 @app.route("/oldroom", methods=["GET", "POST"])
