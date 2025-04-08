@@ -235,10 +235,10 @@ def connection():
             roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
             user_data = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
             usernames_list = [user["username"] for user in user_data]
+            while len(usernames_list)<=4:
+                usernames_list.append("Waiting...")
 
-            userindex = usernames_list.index(username)
-            userlabeldict = {0:"p1", 1:"p2", 2:"p3", 3:"p4"}
-            userlabel = userlabeldict[userindex]
+            userlabeldict = {"p1":usernames_list[0],"p2":usernames_list[1],"p3":usernames_list[2],"p4":usernames_list[3]}
             join_room(roomname)
         else:
             # Fall back to session data or connection data
@@ -260,12 +260,14 @@ def disconnection():
             username = request.cookies.get("username")
             user_id = request.cookies.get("user_id")
             roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
+            delete = supabase.table("userinfo").delete().eq("roomname", roomname).execute()
             user_data = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
             usernames_list = [user["username"] for user in user_data]
+            while len(usernames_list)<=4:
+                usernames_list.append("Waiting...")
 
-            userindex = usernames_list.index(username)
-            userlabeldict = {0:"p1", 1:"p2", 2:"p3", 3:"p4"}
-            userlabel = userlabeldict[userindex]
+            userlabeldict = {"p1":usernames_list[0],"p2":usernames_list[1],"p3":usernames_list[2],"p4":usernames_list[3]}
+            
             leave_room(roomname)
         else:
             username = "Unknown"
