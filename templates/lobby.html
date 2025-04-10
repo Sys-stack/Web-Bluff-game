@@ -149,7 +149,6 @@
   <div id="connection-status" class="connection-status disconnected">WebSocket: Disconnected</div>
   <h1 class="game-title"><u>LOBBY</u></h1>
   <div class="menuitems">
-    <form action="/newroom" method="POST">
       <h2 class="game-title1">ROOM INFO</h2><br>
       <text>Roomname: {{roomname}}</text><br>
       <text>Password: {{password}}</text><br>
@@ -161,7 +160,6 @@
       <text class="player-item">○ <span id="p4">{{ p4 }}</span></text><br><br>
 
       <button class="mainbutton" id="play">PLAY</button>
-    </form>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
