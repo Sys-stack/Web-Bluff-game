@@ -160,7 +160,7 @@
       <text class="player-item">○ <span id="p3">{{ p3 }}</span></text><br>
       <text class="player-item">○ <span id="p4">{{ p4 }}</span></text><br><br>
 
-      <button class="mainbutton" name="action" value="play">PLAY</button>
+      <button class="mainbutton" name="action" id="play">PLAY</button>
     </form>
   </div>
 
@@ -182,9 +182,6 @@
       connectionStatus.textContent = "WebSocket: Connected";
       connectionStatus.classList.remove("disconnected");
       connectionStatus.classList.add("connected");
-
-      
-
     });
 
     // Handle disconnection
@@ -192,7 +189,6 @@
       connectionStatus.textContent = "WebSocket: Disconnected";
       connectionStatus.classList.remove("connected");
       connectionStatus.classList.add("disconnected");
-
     });
 
     // Listen for other events such as when someone connects or disconnects
@@ -201,11 +197,7 @@
       P2.textContent = data.userlist.p2;
       P3.textContent = data.userlist.p3;
       P4.textContent = data.userlist.p4;
-
-
-
-      console.log(data.username + ' has connected');
-      // Update the frontend with the new user info if needed
+      console.log(data.username + ' has connected');      // Update the frontend with the new user info if needed
     });
 
     socket.on('disconnect_response', function(data) {
@@ -214,9 +206,23 @@
       P2.textContent = data.userlist.p2;
       P3.textContent = data.userlist.p3;
       P4.textContent = data.userlist.p4;
-      console.log(data.username + ' has disconnected');
-      // Update the frontend with the user info who disconnected
+      console.log(data.username + ' has disconnected');      // Update the frontend with the user info who disconnected
     });
+    
+    document.getElementById("play").addEventListener("click", () => {
+  if (P1.textContent == "{{username}}") {
+      P1.textContent += "(READY)" ;}
+  if (P2.textContent == "{{username}}") {
+      P2.textContent += "(READY)" ;}
+  if (P3.textContent == "{{username}}") {
+      P3.textContent += "(READY)" ;}
+  if (P4.textContent == "{{username}}") {
+      P4.textContent += "(READY)" ;}
+    });
+
+  if (P1.textContent.includes("(READY)") && P2.textContent.includes("(READY)") && P3.textContent.includes("(READY)") && P4.textContent.includes("(READY)")) {
+socket.emit("game-start");
+}
   </script>
 </body>
 </html>
