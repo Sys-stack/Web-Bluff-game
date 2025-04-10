@@ -125,6 +125,7 @@ def newroom():
 @app.route("/room/<roomname>", methods = ["POST", "GET"])
 def lobby(roomname):
     user_id = request.cookies.get("user_id")
+    username = request.cookies.get("username")
     if not user_id:
         return redirect(url_for("rooms"))
     
@@ -152,7 +153,8 @@ def lobby(roomname):
     return render_template(
             "lobby.html", 
             roomname=roomname, 
-            password=room_password
+            password=room_password,
+            username=username
         )
 
 @app.route("/oldroom", methods=["GET", "POST"])
