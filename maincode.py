@@ -207,16 +207,7 @@ def game():
 # ------------------------
 # SOCKETS
 # ------------------------
-@socketio.on('game-start')
-def play():
-    #code to shuffle cards
-    if hasattr(request, 'cookies'):
-            username = request.cookies.get("username")
-            user_id = request.cookies.get("user_id")
-            roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
-            url = {"url":url_for("game", roomname = roomname)}
-            emit("redirect", url, to = roomname)
-    
+
 @socketio.on('connect')
 def connection():
     try:
@@ -273,11 +264,38 @@ def disconnection():
         print(f"Error in disconnection handler: {e}")
 
 @socketio.on("player-ready")
-def handle_ready():
-    user_id = request.cookies.get("user_id")
+def handle_player_ready():
     username = request.cookies.get("username")
-    roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
-    emit("player-is-ready", {"username": username},to = roomname)
+    user_id = request.cookies.get("user_id")
+
+    # Get the player's room
+    roomname = supabase.table("userinfo")\
+        .select("roomname")\
+        .eq("ip", user_id)\
+        .single()\
+        .execute().data["roomname"]
+
+    join_room(roomname)  # Ensure user is in the correct room
+
+    # Initialize room entry if missing
+    if roomname not in ready_players:
+        ready_players[roomname] = set()
+
+    ready_players[roomname].add(username)
+
+    # Broadcast to all clients in the room
+    emit("player-is-ready", {"username": username}, room=roomname)
+
+    # Check total number of players in the room
+    total_users = supabase.table("userinfo")\
+        .select("username")\
+        .eq("roomname", roomname)\
+        .execute().data
+
+    if len(ready_players[roomname]) == len(total_users):
+        # All players are ready — start the game
+        emit("redirect", {"url": url_for("game", roomname=roomname)}, room=roomname)
+        ready_players.pop(roomname)  # Optional: clear room after starting
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Use Render's assigned port
