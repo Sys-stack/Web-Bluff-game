@@ -200,7 +200,7 @@ def oldroom():
     return render_template("oldroom.html")
   
 @app.route("/game/<roomname>", methods = ["GET", "POST"])
-def game():
+def game(roomname):
     return "<h1> GAME STARTD </h1>"
 
     
