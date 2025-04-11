@@ -256,7 +256,7 @@ def disconnection():
 
             userlabeldict = {"p1":usernames_list[0],"p2":usernames_list[1],"p3":usernames_list[2],"p4":usernames_list[3]}
             
-            leave_room()
+            leave_room(roomname)
         else:
             username = "Unknown"
             user_id = request.sid
