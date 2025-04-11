@@ -297,6 +297,16 @@ def handle_player_ready():
         emit("redirect", {"url": url_for("game", roomname=roomname)}, room=roomname)
         ready_players.pop(roomname)  # Optional: clear room after starting
 
+@socketio.on('disconnect')
+def deleteroom():
+    if hasattr(request, "cookies"):
+        
+        user_id = request.cookies.get("user_id")
+        roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).execute().data[0]["roomname"]
+        users = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
+        if not users:
+            supabase.table("rooms").delete().eq("name", roomname).execute()
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Use Render's assigned port
     socketio.run(app, host='0.0.0.0', port=port)
