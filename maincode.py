@@ -210,6 +210,12 @@ def game():
 @socketio.on('game-start')
 def play():
     #code to shuffle cards
+    if hasattr(request, 'cookies'):
+            username = request.cookies.get("username")
+            user_id = request.cookies.get("user_id")
+            roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
+            url = {"url":url_for("game", roomname = roomname)}
+            emit("redirect", url, to = roomname)
     
 @socketio.on('connect')
 def connection():
