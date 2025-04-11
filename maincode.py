@@ -40,7 +40,7 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", os.urandom(24))  # Added
 # ------------------------
 # Routes
 # ------------------------
-
+ready_players = {}
 @app.route("/", methods=["GET", "POST"])
 def home():
     action = request.form.get("action")
