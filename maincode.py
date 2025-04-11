@@ -241,8 +241,14 @@ def disconnection():
         if hasattr(request, 'cookies'):
             username = request.cookies.get("username")
             user_id = request.cookies.get("user_id")
-            roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
+            rooms = supabase.table("userinfo").select("roomname").eq("ip", user_id).execute().data
+            roomname = rooms[0]["roomname"]
+              
             delete = supabase.table("userinfo").delete().eq("ip", user_id).execute()
+            users = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
+            if not users:
+                supabase.table("rooms").delete().eq("name", roomname).execute()
+
             user_data = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
             usernames_list = [user["username"] for user in user_data]
             while len(usernames_list)<=4:
@@ -296,17 +302,7 @@ def handle_player_ready():
         # All players are ready — start the game
         emit("redirect", {"url": url_for("game", roomname=roomname)}, room=roomname)
         ready_players.pop(roomname)  # Optional: clear room after starting
-
-@socketio.on('disconnect')
-def deleteroom():
-    if hasattr(request, "cookies"):
         
-        user_id = request.cookies.get("user_id")
-        roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).execute().data[0]["roomname"]
-        users = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
-        if not users:
-            supabase.table("rooms").delete().eq("name", roomname).execute()
-
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Use Render's assigned port
     socketio.run(app, host='0.0.0.0', port=port)
