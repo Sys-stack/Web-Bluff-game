@@ -222,7 +222,7 @@
 socket.emit("game-start");
 }
   socket.on('redirect', (url) => {
-    window.location.href = url;
+    window.location.href = url.url;
   });
 
   </script>
