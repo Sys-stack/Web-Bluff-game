@@ -208,15 +208,17 @@
     });
     
     document.getElementById("play").addEventListener("click", () => {
-  if (P1.textContent == "{{username}}") {
-      P1.textContent += "(READY)" ;}
-  if (P2.textContent == "{{username}}") {
-      P2.textContent += "(READY)" ;}
-  if (P3.textContent == "{{username}}") {
-      P3.textContent += "(READY)" ;}
-  if (P4.textContent == "{{username}}") {
-      P4.textContent += "(READY)" ;}
-    });
+  socket.emit("player-ready");
+});
+socket.on("player-is-ready", (data) => {
+  const username = data.username;
+  [P1, P2, P3, P4].forEach(el => {
+    if (el.textContent.trim() === username) {
+      el.textContent = username + " (READY)";
+    }
+  });
+});
+
 
   if (P1.textContent.includes("(READY)") && P2.textContent.includes("(READY)") && P3.textContent.includes("(READY)") && P4.textContent.includes("(READY)")) {
 socket.emit("game-start");
