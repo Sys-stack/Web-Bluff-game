@@ -3,7 +3,7 @@ eventlet.monkey_patch()  # Add this at the top before any other imports
 import eventlet.wsgi
 from flask import Flask, request, redirect, url_for, render_template, make_response, jsonify
 import requests
-from flask_socketio import SocketIO, send, emit, join_room, leave_room, get_user_room
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from supabase import create_client, Client
 import os
 import random
@@ -275,8 +275,12 @@ def disconnection():
 @socketio.on("player-ready")
 def handle_ready():
     username = request.cookies.get("username")
-    roomname = get_user_room(username)  # your Supabase logic
-    emit("player-is-ready", {"username": username}, room=roomname)
+    roomname = supabase.table("userinfo")\
+    .select("roomname")\
+    .eq("ip", user_id)\
+    .single()\
+    .execute().data["roomname"]
+    emit("player-is-ready", {"username": username},to = roomname)
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Use Render's assigned port
