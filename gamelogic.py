@@ -1,35 +1,56 @@
 import random
 from collections import defaultdict
 
+userids = ["1sihs", "whhsjs", "eiehje", "ekejj"]
 class BluffGame:
     def __init__(self, num_players=4):
+        
         self.num_players = num_players
         
         self.suits = ['S', 'H', 'C', 'D']
         self.ranks = list(range(1, 14))  
         self.deck = [(suit, rank) for suit in self.suits for rank in self.ranks]
-        
-        self.player_hands = [[] for _ in range(num_players)]
+        self.player_hands = {}
+        for i in userids:
+            self.player_hands[i] = []
         self.current_player = 0
         self.pass_count = 0
         self.last_play = {"player": -1, "claimed_rank": -1, "cards": []}
         self.game_over = False
         
+        self.player_html = {}
+        for i in userids:
+            self.player_html[i] = []
+            
     def deal_cards(self):
         random.shuffle(self.deck)
         
         while self.deck:
-            self.player_hands[len(self.deck) % self.num_players].append(self.deck.pop())
+            index = len(self.deck) % self.num_players
+            self.player_hands[userids[index]].append(self.deck.pop())
             
-        for i in range(self.num_players):
+        for i in userids:
             self.player_hands[i].sort(key=lambda x: x[1])
     
-    def sort_hand(self, pnum):
+    def sort_hand(self, userid):
         # Group cards by rank
         hand_by_rank = defaultdict(list)
-        for suit, rank in self.player_hands[pnum]:
+        for suit, rank in self.player_hands[userid]:
             hand_by_rank[rank].append(suit)
 
-    def display_hand(self, pnum):
-        for 
+    def display_hand(self, userid):
+        for suit, rank in self.player_hands[userid]:
+            self.player_html[userid].append(f'<img class = "card" src = "https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/Dark%20Cards/{rank}-{suit}.png" value = "{rank}{suit}"> ')
+            
+    def reset_html(self, userid):
+        self.player_html[userid] = []
     
+    def play(self, userid):
+        print(self.player_hands[userid])
+        print(self.player_html[userid])
+    
+if __name__ == "__main__":
+    game = BluffGame()
+    game.deal_cards()
+    game.display_hand(userids[0])
+    game.play(userids[0])
