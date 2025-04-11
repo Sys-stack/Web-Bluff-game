@@ -274,12 +274,9 @@ def disconnection():
 
 @socketio.on("player-ready")
 def handle_ready():
+    user_id = request.cookies.get("user_id")
     username = request.cookies.get("username")
-    roomname = supabase.table("userinfo")\
-    .select("roomname")\
-    .eq("ip", user_id)\
-    .single()\
-    .execute().data["roomname"]
+    roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
     emit("player-is-ready", {"username": username},to = roomname)
 
 if __name__ == '__main__':
