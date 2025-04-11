@@ -199,35 +199,18 @@ def oldroom():
         
     return render_template("oldroom.html")
   
+@app.route("/game/<roomname>", methods = ["GET", "POST"])
+def game():
+    return "<h1> GAME STARTD </h1>"
 
-@app.route("/leave_room")
-def leave_room():
-    user_id = request.cookies.get("user_id")
-    if user_id:
-        try:
-            # Remove user from room
-            supabase.table("userinfo").delete().eq("ip", user_id).execute()
-            
-            # Check if room is empty and delete if so
-            user_info = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute()
-            if user_info.data:
-                roomname = user_info.data.get("roomname")
-                remaining_users = supabase.table("userinfo").select("count").eq("roomname", roomname).execute()
-                if remaining_users.count == 0:
-                    supabase.table("rooms").delete().eq("name", roomname).execute()
-        except Exception:
-            pass  # If there's an error, just continue to redirect
-            
-        resp = make_response(redirect(url_for("rooms")))
-        resp.delete_cookie("user_id")
-        return resp
-    
-    return redirect(url_for("rooms"))
     
 # ------------------------
 # SOCKETS
 # ------------------------
-
+@socketio.on('game-start')
+def play():
+    #code to shuffle cards
+    
 @socketio.on('connect')
 def connection():
     try:
