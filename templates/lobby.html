@@ -221,6 +221,10 @@
   if (P1.textContent.includes("(READY)") && P2.textContent.includes("(READY)") && P3.textContent.includes("(READY)") && P4.textContent.includes("(READY)")) {
 socket.emit("game-start");
 }
+  socket.on('redirect', (url) => {
+    window.location.href = url;
+  });
+
   </script>
 </body>
 </html>
