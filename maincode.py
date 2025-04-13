@@ -1,11 +1,22 @@
+
+# IMPORTS: DUAL COMMUNICATON
+
 import eventlet
 eventlet.monkey_patch()  # Add this at the top before any other imports
 import eventlet.wsgi
+
+# IMPORTS: FLASK
+
 from flask import Flask, request, redirect, url_for, render_template, make_response, jsonify
 import requests
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
+
+# IMPORTS: SUPABASE
 from supabase import create_client, Client
 import os
+
+# IMPORTS: MISC USES
+
 import random
 import string
 import uuid
@@ -198,9 +209,24 @@ def oldroom():
 
         
     return render_template("oldroom.html")
-  
+
+userids = {}  
+gamerooms = {}
+
 @app.route("/game/<roomname>", methods = ["GET", "POST"])
 def game(roomname):
+    
+    user_id = request.cookies.get("user_id")
+    roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
+    user_data = supabase.table("userinfo").select("ip").eq("roomname", roomname).execute().data
+    
+    if not (roomname in userids):
+        userids[roomname] = [user["username"] for user in user_data]
+
+    from gamelogic import BluffGame
+    if not (roomname in gamerooms):
+        gamerooms[roomname] = BluffGame(userids, roomname)
+    
     return "<h1> GAME STARTD </h1>"
 
     
