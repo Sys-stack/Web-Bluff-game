@@ -69,11 +69,19 @@ class BluffGame:
             self.player_hands[self.bluff_caller].extend(self.deck)
             self.sort_hand(self.player_hands[self.bluff_caller])
             self.deck = []
+            
+            for key in self.called_bluff:
+                self.called_bluff[key] = False
+                
             return "not-bluff"
         else:
             self.player_hands[self.current_player].extend(self.deck)
             self.sort_hand(self.current_player)
             self.deck = []
+            
+            for key in self.called_bluff:
+                self.called_bluff[key] = False
+            
             return "bluff"
              
          
