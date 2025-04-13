@@ -1,10 +1,6 @@
 import random
 from collections import defaultdict
 
-#initialising variables
-
-
-
 class BluffGame:
     def __init__(self, userids, roomname, num_players=4):
         
@@ -18,20 +14,22 @@ class BluffGame:
         self.player_hands = {}
         for i in userids[roomname]:
             self.player_hands[i] = []
-        self.current_player = 0
+            
+        self.current_player = None
         self.turn_count = 1
         self.last_play = {"player": -1, "claimed_rank": -1, "cards": []}
         
-        self.game_over = False
+        self.game_status = True
         
-        self.turn = {"previous":[], "current":[], "played_previous":[], "played_current":[]}
+        self.turn = {"played_previous":[]}
         
         self.player_html = {}
-        self.call_bluff = {}
-        for i in userids[roomname]:
-            self.call_bluff[i] = False
-        for i in userids:
+        self.called_bluff = {}
+        for i in self.userids:
+            self.called_bluff[i] = False
+        for i in self.userids:
             self.player_html[i] = []
+        self.bluff_caller = None
             
     def deal_cards(self):
         random.shuffle(self.deck)
@@ -40,14 +38,11 @@ class BluffGame:
             index = len(self.deck) % self.num_players
             self.player_hands[userids[roomname][index]].append(self.deck.pop())
             
-        for i in userids[roomname]:
+        for i in self.userids:
             self.player_hands[i].sort(key=lambda x: x[1])
     
     def sort_hand(self, userid):
-        # Group cards by rank
-        hand_by_rank = defaultdict(list)
-        for suit, rank in self.player_hands[userid]:
-            hand_by_rank[rank].append(suit)
+        self.player_hands[userid].sort(key = lambda x : x[1])
 
     def display_hand(self, userid):
         self.player_html[userid] = []
@@ -62,12 +57,33 @@ class BluffGame:
             self.player_hands[userid].remove(selected_cards)
         
     def call_bluff(self, userid):
-        for check in self.call_bluff[userid]:
-            if check:
-                pass
-                if self.turn["previous"][1] != 's':
-                    pass
+        self.called_bluff[userid] = True
         
+        for key in self.called_bluff:
+            if self.called_bluff[key] == True:
+                self.bluff_caller = key
+            else:
+                self.bluff_caller = None
+        
+        if self.check_bluff_truth():
+            self.player_hands[self.bluff_caller].extend(self.deck)
+            self.sort_hand(self.player_hands[self.bluff_caller])
+            self.deck = []
+            return "not-bluff"
+        else:
+            self.player_hands[self.current_player].extend(self.deck)
+            self.sort_hand(self.current_player)
+            self.deck = []
+            return "bluff"
+             
+         
+    def check_bluff_truth(self):
+        self.boolvar = True
+        for card in self.turn["previous_played"]:
+            if card[1] != self.turn_count:
+                self.boolvar = False
+                break
+        return self.boolvar
     
     def start(self):
         self.deal_cards()
@@ -81,9 +97,13 @@ class BluffGame:
     def after_play(self, played_hands):
         self.played(self.current_player, played_hands)
         self.turn["previous_played"] = played_hands
+        if self.game_over():
+            self.game_status = False
         
         
     def next_player_shift(self):
+        
+        
         if self.turn_count < 13:
             self.turn_count += 1
         else:
@@ -95,9 +115,11 @@ class BluffGame:
             self.userindex = 0
         self.current_player = self.userids[self.userindex]
         
-    def next_player_turned(self, played_hands):
-        pass
-        
+    def game_over(self):
+        if not self.player_hands[self.current_player]:
+            return True
+        else:
+            return False
         
     
 if __name__ == "__main__":
@@ -118,8 +140,20 @@ if __name__ == "__main__":
     
     print(f"Starter is {game.current_player} and has the deck {game.player_hands[game.current_player]}")
     
-    game.next_player_turned([("C", 5)])
+    game.after_play([game.player_hands[game.current_player][0]])
     
+    print(f" afterplay: {game.player_hands[game.current_player]}")
+    
+    game.next_player_shift()
+    
+    print(f"Starter is {game.current_player} and has the deck {game.player_hands[game.current_player]}")
+    
+    game.after_play([game.player_hands[game.current_player][0]])
+    print(game.called_bluff)
+    print(f" afterplay: {game.player_hands[game.current_player]}")
+    
+    print(f" {game.userids[0]} has called bull shit {game.current_player}, and the card is a {game.call_bluff(game.userids[0])}")
+    print(f"After BULLSHITTED {game.player_hands[game.current_player]}")
     
         
     
