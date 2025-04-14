@@ -226,8 +226,7 @@ def game(roomname):
         roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
         user_data = supabase.table("userinfo").select("ip").eq("roomname", roomname).execute().data
     
-        if not (roomname in userids):
-            userids[roomname] = [user["username"] for user in user_data]
+        
             
         return render_template("gameroom.html")
             
