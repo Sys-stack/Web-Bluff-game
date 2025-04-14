@@ -222,10 +222,7 @@ def oldroom():
 @app.route("/game/<roomname>", methods = ["GET", "POST"])
 def game(roomname):
     try: 
-        user_id = request.cookies.get("user_id")
-        roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
-        user_data = supabase.table("userinfo").select("ip").eq("roomname", roomname).execute().data
-    
+        
         
             
         return render_template("gameroom.html")
