@@ -331,7 +331,29 @@ def handle_player_ready():
         emit("redirect", {"url": url_for("game", roomname=roomname)}, room=roomname)
             
         ready_players.pop(roomname)  # Optional: clear room after starting
-        
+
+@socketio.on('game-connect')
+def to_start_game(data):
+    user_id = request.cookies.get("user_id")
+    roomname = supabase.table("userinfo")\
+        .select("roomname")\
+        .eq("ip", user_id)\
+        .single()\
+        .execute().data["roomname"]
+    
+    if not (roomname in userids):
+        userids[roomname] = [user_id]
+    elif roomname in userids:
+        userids[roomname].append(user_id)
+    if len(userids[roomname]) == 4:
+        if not (roomname in gamerooms):
+            gamerooms[roomname] = BluffGame(userids, roomname)
+            gamerooms[roomname].start(userids, roomname)
+            for id in gamerooms.userids:
+                html = gamerooms[roomname].display_hands(id)
+                
+                emit("game-start", html, to = connectedusers[id])
+             
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Use Render's assigned port
     socketio.run(app, host='0.0.0.0', port=port)
