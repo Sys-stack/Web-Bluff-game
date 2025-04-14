@@ -12,11 +12,13 @@ import requests
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 
 # IMPORTS: SUPABASE
+
 from supabase import create_client, Client
 import os
 
 # IMPORTS: MISC USES
 
+from gamelogic import BluffGame
 import random
 import string
 import uuid
@@ -28,7 +30,12 @@ import uuid
 def generate_unique_id():
     """Generate a unique ID using UUID4 (more collision-resistant than 4 characters)"""
     return str(uuid.uuid4())[:8]  # Using first 8 chars of UUID for readability
+
 usernames = []
+userids = {}  
+gamerooms = {}
+connectedusers = {}
+
 # ------------------------
 # Supabase Setup
 # ------------------------
@@ -210,8 +217,7 @@ def oldroom():
         
     return render_template("oldroom.html")
 
-userids = {}  
-gamerooms = {}
+
 
 @app.route("/game/<roomname>", methods = ["GET", "POST"])
 def game(roomname):
@@ -223,11 +229,9 @@ def game(roomname):
     if not (roomname in userids):
         userids[roomname] = [user["username"] for user in user_data]
 
-    from gamelogic import BluffGame
-    if not (roomname in gamerooms):
-        gamerooms[roomname] = BluffGame(userids, roomname)
     
-    return "<h1> GAME STARTD </h1>"
+    
+    return render_template("gameroom.html")
 
     
 # ------------------------
@@ -240,6 +244,7 @@ def connection():
         if hasattr(request, 'cookies'):
             username = request.cookies.get("username")
             user_id = request.cookies.get("user_id")
+            connectedusers[user_id] = request.sid
             roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
             user_data = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
             usernames_list = [user["username"] for user in user_data]
@@ -269,7 +274,7 @@ def disconnection():
             user_id = request.cookies.get("user_id")
             rooms = supabase.table("userinfo").select("roomname").eq("ip", user_id).execute().data
             roomname = rooms[0]["roomname"]
-              
+            connectedusers.pop(user_id)
             delete = supabase.table("userinfo").delete().eq("ip", user_id).execute()
             users = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
             if not users:
@@ -319,14 +324,12 @@ def handle_player_ready():
     emit("player-is-ready", {"username": username}, room=roomname)
 
     # Check total number of players in the room
-    total_users = supabase.table("userinfo")\
-        .select("username")\
-        .eq("roomname", roomname)\
-        .execute().data
+    total_users = 4
 
-    if len(ready_players[roomname]) == len(total_users):
+    if len(ready_players[roomname]) == total_users:
         # All players are ready — start the game
         emit("redirect", {"url": url_for("game", roomname=roomname)}, room=roomname)
+            
         ready_players.pop(roomname)  # Optional: clear room after starting
         
 if __name__ == '__main__':
