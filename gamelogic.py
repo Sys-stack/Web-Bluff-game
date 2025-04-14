@@ -36,7 +36,7 @@ class BluffGame:
         
         while self.deck:
             index = len(self.deck) % self.num_players
-            self.player_hands[userids[roomname][index]].append(self.deck.pop())
+            self.player_hands[self.userids[index]].append(self.deck.pop())
             
         for i in self.userids:
             self.player_hands[i].sort(key=lambda x: x[1])
