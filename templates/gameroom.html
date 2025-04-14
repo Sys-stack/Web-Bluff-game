@@ -200,7 +200,7 @@
 </div>
 
 
-  <div class="selfgamebar"></div>
+  <div class="selfgamebar" id = "self"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
   <script>
@@ -212,6 +212,11 @@
     socket.on('connect', function() {
     socket.emit('game-connect')
     });
+
+    socket.on("game-start", (data) => {
+  document.getElementById("self").innerHTML = data.html;
+});
+
   
   </script>
 </body>
