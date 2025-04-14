@@ -333,7 +333,7 @@ def handle_player_ready():
         ready_players.pop(roomname)  # Optional: clear room after starting
 
 @socketio.on('game-connect')
-def to_start_game(data):
+def to_start_game():
     user_id = request.cookies.get("user_id")
     roomname = supabase.table("userinfo")\
         .select("roomname")\
