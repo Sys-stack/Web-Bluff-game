@@ -359,8 +359,8 @@ def to_start_game():
 
                 # DO NOT CHANGE THIS LINE AS PER YOUR REQUEST
                 for id in gamerooms[roomname].userids:
-                    html = gamerooms[roomname].display_hand(id)
-                    emit("game-start", {"html": html}, to=connectedusers[id])
+                    gamerooms[roomname].display_hand(id)
+                    emit("game-start", {"html": gamerooms[roomname].player_html[id]}, to=connectedusers[id])
 
     except Exception as e:
         print(f"Error in to_start_game: {e}")
