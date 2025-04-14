@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bluff Game</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    @font-face {
+      font-family: "bluff";
+      src: url('https://cdn.jsdelivr.net/gh/Sys-stack/Web-Bluff-game@style-font-decor/Blocktopia.ttf') format('truetype');
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: black;
+      background-image: url('https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/Picture1.png');
+      background-size: 300px;
+      background-repeat: repeat;
+      animation: moveBackground 10s linear infinite;
+      font-family: "bluff", sans-serif;
+      color: white;
+    }
+
+    @keyframes moveBackground {
+      from { background-position: 0 0; }
+      to { background-position: 300px 300px; }
+    }
+
+    @keyframes pulseWidth {
+      0% { transform: scaleX(1); }
+      50% { transform: scaleX(1.1); }
+      100% { transform: scaleX(0.95); }
+    }
+
+    .game-title {
+      font-size: 5rem;
+      text-align: center;
+      color: white;
+      margin-bottom: 20px;
+      -webkit-text-stroke: 2px black;
+      text-shadow: 4px 4px 5px black;
+    }
+
+    .game-title1 {
+      font-size: 2.5rem;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .mainmenu {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .menuitems {
+      background-color: black;
+      padding: 20px;
+      text-align: center;
+      border-radius: 20px;
+      border: 2px solid white;
+      box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+      width: 90%;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+
+    .cardtext {
+      font-size: 1rem;
+      margin-bottom: 5px;
+      color: white;
+      display: block;
+    }
+
+    input[type="text"],
+    input[type="color"] {
+      width: 80%;
+      max-width: 300px;
+      padding: 10px 15px;
+      font-size: 1rem;
+      font-family: "bluff", sans-serif;
+      background-color: white;
+      color: black;
+      border: 2px solid white;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input[type="text"]:focus,
+    input[type="color"]:focus {
+      border-color: red;
+      box-shadow: 0 0 5px red;
+    }
+
+    .mainbutton {
+      font-family: "bluff", sans-serif;
+      font-size: 1.2rem;
+      color: white;
+      background: black;
+      border: 2px solid red;
+      border-radius: 20px;
+      padding: 12px 50px;
+      width: 100%;
+      max-width: 400px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .mainbutton:hover {
+      background-color: white;
+      color: black;
+      border-color: red;
+      animation: pulseWidth 0.6s infinite alternate ease-in-out;
+    }
+
+    .hitbox {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    @media screen and (max-width: 768px) {
+      .mainmenu {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    /* Game UI Layout */
+    .horgamebars {
+      width: 60%;
+      height: 20%;
+      background-color: red;
+    }
+
+    .vergamebars {
+      width: 100%;
+      height: 60%;
+      display: grid;
+      grid-template-columns: 10% 1fr 10%;
+    }
+
+    .selfgamebar {
+      width: 60%;
+      height: 20%;
+      background-color: red;
+    }
+  
+  .side-bar {
+  display: flex;
+  align-items: center;
+  height: 110%;    /* Vertical center */
+  justify-content: center; /* Optional: horizontal center */
+  background-color: blue;
+}
+
+.middle-bar {
+  margin-top: 5%;
+  width: 60%;
+  margin-left: 20%;
+  margin-right: 20%;
+  margin-bottom: 5%;
+  background-color: white;
+}
+ 
+  </style>
+</head>
+<body>
+
+  <div class="horgamebars"></div>
+
+<div class="vergamebars">
+  <div class="side-bar">
+    
+  </div>
+  <div class="middle-bar">
+ 
+  </div>
+  <div class="side-bar">
+ 
+  </div>
+</div>
+
+
+  <div class="selfgamebar"></div>
+
+  <script>
+  
+  </script>
+</body>
+</html>
