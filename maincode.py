@@ -59,6 +59,7 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", os.urandom(24))  # Added
 # Routes
 # ------------------------
 ready_players = {}
+re = False
 @app.route("/", methods=["GET", "POST"])
 def home():
     action = request.form.get("action")
@@ -270,7 +271,7 @@ def connection():
 @socketio.on('disconnect')
 def disconnection():
     try:
-        if hasattr(request, 'cookies'):
+        if (hasattr(request, 'cookies') ) and (not re):
             username = request.cookies.get("username")
             user_id = request.cookies.get("user_id")
             rooms = supabase.table("userinfo").select("roomname").eq("ip", user_id).execute().data
@@ -328,6 +329,8 @@ def handle_player_ready():
     total_users = 4
 
     if len(ready_players[roomname]) == total_users:
+
+        re = True 
         # All players are ready — start the game
         emit("redirect", {"url": url_for("game", roomname=roomname)}, room=roomname)
             
@@ -336,6 +339,7 @@ def handle_player_ready():
 @socketio.on('game-connect')
 def to_start_game():
     try:
+        re = False
         user_id = request.cookies.get("user_id")
         roomname = supabase.table("userinfo")\
             .select("roomname")\
