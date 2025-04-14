@@ -59,7 +59,7 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", os.urandom(24))  # Added
 # Routes
 # ------------------------
 ready_players = {}
-re = False
+intentional_leavers = set()
 @app.route("/", methods=["GET", "POST"])
 def home():
     action = request.form.get("action")
@@ -268,45 +268,12 @@ def connection():
     except Exception as e:
         print(f"Error in connection handler: {e}")
 
-@socketio.on('disconnect')
-def disconnection():
-    try:
-        if (hasattr(request, 'cookies') ) and (not re):
-            username = request.cookies.get("username")
-            user_id = request.cookies.get("user_id")
-            rooms = supabase.table("userinfo").select("roomname").eq("ip", user_id).execute().data
-            roomname = rooms[0]["roomname"]
-            connectedusers.pop(user_id)
-            delete = supabase.table("userinfo").delete().eq("ip", user_id).execute()
-            users = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
-            if not users:
-                supabase.table("rooms").delete().eq("name", roomname).execute()
-
-            user_data = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
-            usernames_list = [user["username"] for user in user_data]
-            while len(usernames_list)<=4:
-                usernames_list.append("Waiting...")
-
-            userlabeldict = {"p1":usernames_list[0],"p2":usernames_list[1],"p3":usernames_list[2],"p4":usernames_list[3]}
-            
-            leave_room(roomname)
-        else:
-            username = "Unknown"
-            user_id = request.sid
-            userlabeldict = {"p1":"Waiting...","p2":"Waiting...","p3":"Waiting...","p4":"Waiting..."}
-            
-        print(f"{username} with ID of {user_id} has disconnected")
-        data = {"username": username, "user_id": user_id, "userlist": userlabeldict}
-        
-        emit("disconnect_response", data, to=roomname)
-    except Exception as e:
-        print(f"Error in disconnection handler: {e}")
 
 @socketio.on("player-ready")
 def handle_player_ready():
     username = request.cookies.get("username")
     user_id = request.cookies.get("user_id")
-
+    intentional_leavers.add(request.sid)
     # Get the player's room
     roomname = supabase.table("userinfo")\
         .select("roomname")\
@@ -330,7 +297,7 @@ def handle_player_ready():
 
     if len(ready_players[roomname]) == total_users:
 
-        re = True 
+        
         # All players are ready — start the game
         emit("redirect", {"url": url_for("game", roomname=roomname)}, room=roomname)
             
@@ -339,7 +306,7 @@ def handle_player_ready():
 @socketio.on('game-connect')
 def to_start_game():
     try:
-        re = False
+        
         user_id = request.cookies.get("user_id")
         roomname = supabase.table("userinfo")\
             .select("roomname")\
@@ -368,6 +335,49 @@ def to_start_game():
 
     except Exception as e:
         print(f"Error in to_start_game: {e}")
+
+@socketio.on('disconnect')
+def disconnection():
+    try:
+        if request.sid in intentional_leavers:
+            intentional_leavers.remove(sid)
+            
+        elif (hasattr(request, 'cookies') ):
+            username = request.cookies.get("username")
+            user_id = request.cookies.get("user_id")
+            rooms = supabase.table("userinfo").select("roomname").eq("ip", user_id).execute().data
+            roomname = rooms[0]["roomname"]
+            connectedusers.pop(user_id)
+            delete = supabase.table("userinfo").delete().eq("ip", user_id).execute()
+            users = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
+            if not users:
+                supabase.table("rooms").delete().eq("name", roomname).execute()
+
+            user_data = supabase.table("userinfo").select("username").eq("roomname", roomname).execute().data
+            usernames_list = [user["username"] for user in user_data]
+            while len(usernames_list)<=4:
+                usernames_list.append("Waiting...")
+
+            userlabeldict = {"p1":usernames_list[0],"p2":usernames_list[1],"p3":usernames_list[2],"p4":usernames_list[3]}
+            
+            leave_room(roomname)
+            print(f"{username} with ID of {user_id} has disconnected")
+            data = {"username": username, "user_id": user_id, "userlist": userlabeldict}
+        
+            emit("disconnect_response", data, to=roomname)
+        else:
+            username = "Unknown"
+            user_id = request.sid
+            userlabeldict = {"p1":"Waiting...","p2":"Waiting...","p3":"Waiting...","p4":"Waiting..."}
+            print(f"{username} with ID of {user_id} has disconnected")
+            data = {"username": username, "user_id": user_id, "userlist": userlabeldict}
+        
+            emit("disconnect_response", data, to=roomname)
+            
+        
+    except Exception as e:
+        print(f"Error in disconnection handler: {e}")
+
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Use Render's assigned port
