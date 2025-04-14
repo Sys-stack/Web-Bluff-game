@@ -334,26 +334,36 @@ def handle_player_ready():
 
 @socketio.on('game-connect')
 def to_start_game():
-    user_id = request.cookies.get("user_id")
-    roomname = supabase.table("userinfo")\
-        .select("roomname")\
-        .eq("ip", user_id)\
-        .single()\
-        .execute().data["roomname"]
-    
-    if not (roomname in userids):
-        userids[roomname] = [user_id]
-    elif roomname in userids:
-        userids[roomname].append(user_id)
-    if len(userids[roomname]) == 4:
-        if not (roomname in gamerooms):
-            gamerooms[roomname] = BluffGame(userids, roomname)
-            gamerooms[roomname].start(userids, roomname)
-            for id in gamerooms.userids:
-                html = gamerooms[roomname].display_hands(id)
-                
-                emit("game-start", html, to = connectedusers[id])
-             
+    try:
+        user_id = request.cookies.get("user_id")
+        roomname = supabase.table("userinfo")\
+            .select("roomname")\
+            .eq("ip", user_id)\
+            .single()\
+            .execute().data["roomname"]
+
+        # Store user_id under that room
+        if roomname not in userids:
+            userids[roomname] = [user_id]
+        else:
+            if user_id not in userids[roomname]:
+                userids[roomname].append(user_id)
+
+        # Once room has 4 players, start the game
+        if len(userids[roomname]) == 4:
+            if roomname not in gamerooms:
+                # Create the BluffGame instance
+                gamerooms[roomname] = BluffGame(userids, roomname)
+                gamerooms[roomname].start()
+
+                # DO NOT CHANGE THIS LINE AS PER YOUR REQUEST
+                for id in gamerooms[roomname].userids:
+                    html = gamerooms[roomname].display_hand(id)
+                    emit("game-start", {"html": html}, to=connectedusers[id])
+
+    except Exception as e:
+        print(f"Error in to_start_game: {e}")
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))  # Use Render's assigned port
     socketio.run(app, host='0.0.0.0', port=port)
