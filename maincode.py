@@ -221,17 +221,22 @@ def oldroom():
 
 @app.route("/game/<roomname>", methods = ["GET", "POST"])
 def game(roomname):
+    try: 
+        user_id = request.cookies.get("user_id")
+        roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
+        user_data = supabase.table("userinfo").select("ip").eq("roomname", roomname).execute().data
     
-    user_id = request.cookies.get("user_id")
-    roomname = supabase.table("userinfo").select("roomname").eq("ip", user_id).single().execute().data["roomname"]
-    user_data = supabase.table("userinfo").select("ip").eq("roomname", roomname).execute().data
+        if not (roomname in userids):
+            userids[roomname] = [user["username"] for user in user_data]
+            
+        return render_template("gameroom.html")
+            
+    except Exception as e:
+        app.logger.error(f"Database insert error: {e}")
+        return f"<h1> error: {e}</h1>"
+     
     
-    if not (roomname in userids):
-        userids[roomname] = [user["username"] for user in user_data]
-
     
-    
-    return render_template("gameroom.html")
 
     
 # ------------------------
