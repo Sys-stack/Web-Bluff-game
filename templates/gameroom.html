@@ -159,9 +159,10 @@
     }
 
     .selfgamebar {
-      width: 60%;
-      height: 20%;
+      display: flex;
+      
       background-color: red;
+      justify-content: center;
     }
   
   .side-bar {
@@ -180,27 +181,80 @@
   margin-bottom: 5%;
   background-color: white;
 }
+/* Default card styles */
+.card {
+  margin-left: -15%;  /* Initial margin when not selected */
+  margin-right: 0;
+  transition: margin 0.3s, transform 0.3s;
+  height: 65px;
+}
+
+/* Styles for selected card */
+.card.selected {
+  margin-left: 20%;    /* Reset margin when selected */
+  margin-right: 5%;   /* Reset margin when selected */
+  z-index: 20;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 1);  /* Add glowing effect */
+}
+
+/* Hover effect for card (for interaction feedback) */
+.card:hover {
+  margin-left: 2px;   /* Slight margin on hover for effect */
+  margin-right: 7%;   /* Slight overlap for hover effect */
+  z-index: 10;
+}
+
+  .interface {
+    display: grid;
+    height: 20%;
+    grid-template-columns: 20% 60% 20%;
+  }
+  
+  #prompt {
+  transition: opacity 1s ease;
+  opacity: 1;
+}
+.hidden {
+  opacity: 0;
+}
+
  
   </style>
 </head>
 <body>
 
-  <div class="horgamebars"></div>
+  <div class="horgamebars" id = "nextnext"></div>
 
 <div class="vergamebars">
-  <div class="side-bar">
+  <div class="side-bar" id = "next">
     
   </div>
   <div class="middle-bar">
  
   </div>
-  <div class="side-bar">
+  <div class="side-bar" id = "nextnextnext">
  
   </div>
 </div>
 
-
-  <div class="selfgamebar" id = "self"></div>
+  <div class = "interface">
+    <div>
+      
+    </div>
+    
+    
+    
+  <div class="selfgamebar" id = "self">
+</div>
+    
+    <div>
+      <span id = "prompt"> </span>
+      <button class = "mainbutton" id = 'play'> PLAY </button>
+      <button class = "mainbutton" id = 'bluff'> BLUFF </button>
+    </div>
+  </div>
+  
+  
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
   <script>
@@ -215,9 +269,76 @@
 
     socket.on("game-start", (data) => {
   document.getElementById("self").innerHTML = data.html;
+  document.getElementById("next").innerHTML = data.next;
+  document.getElementById("nextnext").innerHTML = data.nextnext;
+  document.getElementById("nextnextnext").innerHTML = data.nextnextnext;
+  const currentPlayer = data.currentplayer;
+      
 });
 
   
+  const selectedCards = [];
+  const maxSelected = 4;
+
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+      const cardValue = card.getAttribute('value');
+
+      const isSelected = card.classList.contains('selected');
+
+      if (isSelected) {
+        // Deselect it
+        card.classList.remove('selected');
+        const index = selectedCards.indexOf(cardValue);
+        if (index > -1) selectedCards.splice(index, 1);
+      } else {
+        if (selectedCards.length >= maxSelected) {
+          // Remove first selected
+          const firstValue = selectedCards.shift();
+          const firstCard = document.querySelector(`.card[data-card-value="${firstValue}"]`);
+          if (firstCard) firstCard.classList.remove('selected');
+        }
+
+        // Select new card
+        card.classList.add('selected');
+        selectedCards.push(cardValue);
+      }
+
+      console.log('Selected card values:', selectedCards);
+    });
+  });
+  
+  socketio.on("switch", funtion(data) {
+    const currentPlayer = data.currentplayer;
+  });
+  
+  document.getElementById('play').addEventListener('click', function() {
+    if (currentPlayer === "{{ userid }}") {
+        socketio.emit("player-turned", selectedCards);
+    } else {
+        const prompt = document.getElementById("prompt");
+
+        if (prompt.classList.contains("hidden")) {
+            prompt.classList.remove("hidden");
+        }
+
+        prompt.textContent = "It is not your turn";
+
+        setTimeout(() => {
+            prompt.classList.add("hidden");
+        }, 5000);
+    }
+});
+  
+  socketio.on("game-over", function(data) {
+    window.location.href = data.url;
+  });
+  
+
+
+
+
+
   </script>
 </body>
 </html>
