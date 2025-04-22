@@ -12,7 +12,7 @@ class BluffGame:
         self.deck = [(suit, rank) for suit in self.suits for rank in self.ranks]
         
         self.player_hands = {}
-        for i in userids[roomname]:
+        for i in self.userids:
             self.player_hands[i] = []
             
         self.current_player = None
@@ -30,7 +30,13 @@ class BluffGame:
         for i in self.userids:
             self.player_html[i] = []
         self.bluff_caller = None
-            
+
+    def back_hand(self, userid):
+        self.back = ""
+        for card in self.player_hands[userid]:
+            self.back.append("<img class = 'cardback' src = 'https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/BACK.png'>")
+        return self.back.append
+    
     def deal_cards(self):
         random.shuffle(self.deck)
         
