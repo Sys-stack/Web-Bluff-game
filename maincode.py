@@ -30,6 +30,9 @@ import uuid
 def generate_unique_id():
     """Generate a unique ID using UUID4 (more collision-resistant than 4 characters)"""
     return str(uuid.uuid4())[:8]  # Using first 8 chars of UUID for readability
+def fetchroom(userid):
+    roomthing = supabase.table("userinfo").select("roomname").eq("ip", userid).execute().data
+    return roomthing
 
 usernames = []
 userids = {}  
@@ -327,11 +330,27 @@ def to_start_game():
                 # Create the BluffGame instance
                 gamerooms[roomname] = BluffGame(userids, roomname)
                 gamerooms[roomname].start()
+                
 
                 # DO NOT CHANGE THIS LINE AS PER YOUR REQUEST
                 for id in gamerooms[roomname].userids:
+                    index = gamerooms[roomname].userids.index(id)
+                    nextinorder = [0,0,0]
+                    diff = 4 - index 
                     gamerooms[roomname].display_hand(id)
-                    emit("game-start", {"html": gamerooms[roomname].player_html[id]}, to=connectedusers[id])
+                    for other in range(1,4):
+                        if (index + other) < 4:
+                            nextinorder[other - 1] = gamerooms[roomname].userids[index + other]
+                        else:
+                            nextinorder[other - 1] = gamerooms[roomname].userids[index + other - diff]
+                
+                    
+                    emit("game-start", {"html": gamerooms[roomname].player_html[id],
+                                       "next": gamerooms[roomanme].back_hand(nextinorder[0],
+                                        "nextnext": gamerooms[roomanme].back_hand(nextinorder[1],
+                                        "nextnextnext": gamerooms[roomanme].back_hand(nextinorder[2],
+                                        "current_player": gamerooms[roomname].current_player
+                                        }, to=connectedusers[id])
 
     except Exception as e:
         print(f"Error in to_start_game: {e}")
@@ -377,6 +396,38 @@ def disconnection():
         
     except Exception as e:
         print(f"Error in disconnection handler: {e}")
+
+@socketio.on('player-turned')
+def handchange(selectedCards):
+    userid = request.cookies.get('userid')
+    played = []
+    for cardval in selectedCards:
+        played.append((cardval[1], int(cardval[0]))
+    roomname = fetchroom(userid)
+
+    gamerooms[roomname].after_play(played)
+    gamerooms[roomname].next_player_shift()
+    for id in gamerooms[roomname].userids:
+        index = gamerooms[roomname].userids.index(id)
+        nextinorder = [0,0,0]
+        diff = 4 - index 
+        gamerooms[roomname].display_hand(id)
+        for other in range(1,4):
+            if (index + other) < 4:
+                nextinorder[other - 1] = gamerooms[roomname].userids[index + other]
+            else:
+                nextinorder[other - 1] = gamerooms[roomname].userids[index + other - diff]
+                
+                    
+        emit("switch", {"html": gamerooms[roomname].player_html[id],
+                            "next": gamerooms[roomanme].back_hand(nextinorder[0],
+                            "nextnext": gamerooms[roomanme].back_hand(nextinorder[1],
+                            "nextnextnext": gamerooms[roomanme].back_hand(nextinorder[2],
+                            "current_player": gamerooms[roomname].current_player
+                             }, to=connectedusers[id])
+    
+
+
 
 
 if __name__ == '__main__':
