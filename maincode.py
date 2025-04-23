@@ -346,10 +346,10 @@ def to_start_game():
                 
                     
                     emit("game-start", {"html": gamerooms[roomname].player_html[id],
-                                       "next": gamerooms[roomanme].back_hand(nextinorder[0],
-                                        "nextnext": gamerooms[roomanme].back_hand(nextinorder[1],
-                                        "nextnextnext": gamerooms[roomanme].back_hand(nextinorder[2],
-                                        "current_player": gamerooms[roomname].current_player
+                                       "next": gamerooms[roomanme].back_hand(nextinorder[0]),
+                                        "nextnext": gamerooms[roomanme].back_hand(nextinorder[1]),
+                                        "nextnextnext": gamerooms[roomanme].back_hand(nextinorder[2]),
+                                        "currentplayer": gamerooms[roomname].current_player
                                         }, to=connectedusers[id])
 
     except Exception as e:
@@ -420,10 +420,10 @@ def handchange(selectedCards):
                 
                     
         emit("switch", {"html": gamerooms[roomname].player_html[id],
-                            "next": gamerooms[roomanme].back_hand(nextinorder[0],
-                            "nextnext": gamerooms[roomanme].back_hand(nextinorder[1],
-                            "nextnextnext": gamerooms[roomanme].back_hand(nextinorder[2],
-                            "current_player": gamerooms[roomname].current_player
+                            "next": gamerooms[roomanme].back_hand(nextinorder[0]),
+                            "nextnext": gamerooms[roomanme].back_hand(nextinorder[1]),
+                            "nextnextnext": gamerooms[roomanme].back_hand(nextinorder[2]),
+                            "currentplayer": gamerooms[roomname].current_player
                              }, to=connectedusers[id])
     
 
