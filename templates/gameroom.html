@@ -130,6 +130,12 @@
       animation: pulseWidth 0.6s infinite alternate ease-in-out;
     }
 
+
+    .backcard {
+      height:80px;
+      margin-left: -10%;  /* Initial margin when not selected */
+      margin-right: 0;
+    }
     .hitbox {
       width: 100%;
       display: flex;
@@ -173,6 +179,12 @@
   background-color: blue;
 }
 
+
+#side-bar img {
+  transform: rotate(90deg);
+}
+
+
 .middle-bar {
   margin-top: 5%;
   width: 60%;
@@ -183,10 +195,10 @@
 }
 /* Default card styles */
 .card {
-  margin-left: -15%;  /* Initial margin when not selected */
+  margin-left: -10%;  /* Initial margin when not selected */
   margin-right: 0;
   transition: margin 0.3s, transform 0.3s;
-  height: 65px;
+  height: 90px;
 }
 
 /* Styles for selected card */
@@ -199,7 +211,7 @@
 
 /* Hover effect for card (for interaction feedback) */
 .card:hover {
-  margin-left: 2px;   /* Slight margin on hover for effect */
+  margin-left: 15%;   /* Slight margin on hover for effect */
   margin-right: 7%;   /* Slight overlap for hover effect */
   z-index: 10;
 }
