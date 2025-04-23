@@ -226,10 +226,10 @@ def oldroom():
 @app.route("/game/<roomname>", methods = ["GET", "POST"])
 def game(roomname):
     try: 
-        
+        userid = request.cookies.get("userid")
         
             
-        return render_template("gameroom.html")
+        return render_template("gameroom.html", userid = userid)
             
     except Exception as e:
         app.logger.error(f"Database insert error: {e}")
