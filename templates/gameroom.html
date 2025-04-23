@@ -295,7 +295,8 @@
         if (selectedCards.length >= maxSelected) {
           // Remove first selected
           const firstValue = selectedCards.shift();
-          const firstCard = document.querySelector(`.card[data-card-value="${firstValue}"]`);
+          const firstCard = document.querySelector(`.card[value="${firstValue}"]`);
+
           if (firstCard) firstCard.classList.remove('selected');
         }
 
