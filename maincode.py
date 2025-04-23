@@ -402,7 +402,7 @@ def handchange(selectedCards):
     userid = request.cookies.get('userid')
     played = []
     for cardval in selectedCards:
-        played.append((cardval[1], int(cardval[0]))
+        played.append((cardval[1], int(cardval[0])))
     roomname = fetchroom(userid)
 
     gamerooms[roomname].after_play(played)
