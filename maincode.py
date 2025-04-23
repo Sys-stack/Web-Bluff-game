@@ -359,7 +359,7 @@ def to_start_game():
 def disconnection():
     try:
         if request.sid in intentional_leavers:
-            intentional_leavers.remove(sid)
+            intentional_leavers.remove(request.sid)
             
         elif (hasattr(request, 'cookies') ):
             username = request.cookies.get("username")
