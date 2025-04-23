@@ -34,8 +34,8 @@ class BluffGame:
     def back_hand(self, userid):
         self.back = ""
         for card in self.player_hands[userid]:
-            self.back.append("<img class = 'cardback' src = 'https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/BACK.png'>")
-        return self.back.append
+            self.back += "<img class = 'cardback' src = 'https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/BACK.png'>"
+        return self.back
     
     def deal_cards(self):
         random.shuffle(self.deck)
@@ -51,9 +51,9 @@ class BluffGame:
         self.player_hands[userid].sort(key = lambda x : x[1])
 
     def display_hand(self, userid):
-        self.player_html[userid] = []
+        self.player_html[userid] = ""
         for suit, rank in self.player_hands[userid]:
-            self.player_html[userid].append(f'<img class = "card" src = "https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/Dark%20Cards/{rank}-{suit}.png" value = "{rank}{suit}"> ')
+            self.player_html[userid] += f'<img class = "card" src = "https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/Dark%20Cards/{rank}-{suit}.png" value = "{rank}{suit}"> '
             
         
     def played(self, userid, played_hands):
