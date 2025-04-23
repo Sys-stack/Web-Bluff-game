@@ -346,9 +346,9 @@ def to_start_game():
                 
                     
                     emit("game-start", {"html": gamerooms[roomname].player_html[id],
-                                       "next": gamerooms[roomanme].back_hand(nextinorder[0]),
-                                        "nextnext": gamerooms[roomanme].back_hand(nextinorder[1]),
-                                        "nextnextnext": gamerooms[roomanme].back_hand(nextinorder[2]),
+                                       "next": gamerooms[roomname].back_hand(nextinorder[0]),
+                                        "nextnext": gamerooms[roomname].back_hand(nextinorder[1]),
+                                        "nextnextnext": gamerooms[roomname].back_hand(nextinorder[2]),
                                         "currentplayer": gamerooms[roomname].current_player
                                         }, to=connectedusers[id])
 
@@ -420,9 +420,9 @@ def handchange(selectedCards):
                 
                     
         emit("switch", {"html": gamerooms[roomname].player_html[id],
-                            "next": gamerooms[roomanme].back_hand(nextinorder[0]),
-                            "nextnext": gamerooms[roomanme].back_hand(nextinorder[1]),
-                            "nextnextnext": gamerooms[roomanme].back_hand(nextinorder[2]),
+                            "next": gamerooms[roomname].back_hand(nextinorder[0]),
+                            "nextnext": gamerooms[roomname].back_hand(nextinorder[1]),
+                            "nextnextnext": gamerooms[roomname].back_hand(nextinorder[2]),
                             "currentplayer": gamerooms[roomname].current_player
                              }, to=connectedusers[id])
     
