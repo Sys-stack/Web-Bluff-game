@@ -308,8 +308,13 @@
     });
   });
   
-  socketio.on("switch", funtion(data) {
-    const currentPlayer = data.currentplayer;
+  socketio.on("switch", data => {
+   document.getElementById("self").innerHTML = data.html;
+  document.getElementById("next").innerHTML = data.next;
+  document.getElementById("nextnext").innerHTML = data.nextnext;
+  document.getElementById("nextnextnext").innerHTML = data.nextnextnext;
+  const currentPlayer = data.currentplayer;
+    
   });
   
   document.getElementById('play').addEventListener('click', function() {
