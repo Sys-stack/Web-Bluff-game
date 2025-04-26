@@ -236,7 +236,7 @@
 <body>
 
   <div class="horgamebars" id = "nextnext"></div>
-
+   
 <div class="vergamebars">
   <div class="side-bar" id = "next">
     
@@ -250,7 +250,7 @@
 </div>
 
   <div class = "interface">
-    <div>
+    <div id = "details">
       
     </div>
     
@@ -285,6 +285,7 @@
   document.getElementById("nextnext").innerHTML = data.nextnext;
   document.getElementById("nextnextnext").innerHTML = data.nextnextnext;
   const currentPlayer = data.currentplayer;
+  document.getElementById("details").textContent = data.currentplayer;
       
 });
 
@@ -327,7 +328,7 @@
   document.getElementById("nextnext").innerHTML = data.nextnext;
   document.getElementById("nextnextnext").innerHTML = data.nextnextnext;
   const currentPlayer = data.currentplayer;
-    
+  document.getElementById("details").textContent = data.currentplayer;
   });
   
   document.getElementById('play').addEventListener('click', function() {
