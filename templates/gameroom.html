@@ -271,6 +271,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
   <script>
+    const userid = "{{userid}}"
     // Initialize the WebSocket connection
     var socket = io.connect('https://bluff-r48h.onrender.com', {
   path: '/socket.io',
@@ -335,7 +336,7 @@
   });
   
   document.getElementById('play').addEventListener('click', function() {
-    if (currentPlayer === "{{ userid }}") {
+    if (currentPlayer === userid) {
         socket.emit("player-turned", selectedCards);
     } else {
         const prompt = document.getElementById("prompt");
