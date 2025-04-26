@@ -53,7 +53,7 @@ class BluffGame:
     def display_hand(self, userid):
         self.player_html[userid] = ""
         for suit, rank in self.player_hands[userid]:
-            self.player_html[userid] += f'<img class = "card" src = "https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/Dark%20Cards/{rank}-{suit}.png" value = "{rank}{suit}"> '
+            self.player_html[userid] += f'<img class = "card" id = "card" src = "https://raw.githubusercontent.com/Sys-stack/Web-Bluff-game/refs/heads/style-font-decor/Dark%20Cards/{rank}-{suit}.png" value = "{rank}{suit}"> '
             
         
     def played(self, userid, played_hands):
