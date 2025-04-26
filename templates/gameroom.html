@@ -131,7 +131,7 @@
     }
 
 
-    .backcard {
+    .cardback {
       height:80px;
       margin-left: -10%;  /* Initial margin when not selected */
       margin-right: 0;
@@ -206,11 +206,12 @@
   margin-left: 20%;    /* Reset margin when selected */
   margin-right: 10%;   /* Reset margin when selected */
   z-index: 20;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 1);  /* Add glowing effect */
+  border: 2px solid red;  /* Add glowing effect */
 }
 
 /* Hover effect for card (for interaction feedback) */
 .card:hover {
+  cursor: pointer;
   margin-left: 15%;   /* Slight margin on hover for effect */
   margin-right: 7%;   /* Slight overlap for hover effect */
   z-index: 10;
