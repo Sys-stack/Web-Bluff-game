@@ -325,7 +325,7 @@
   
 
   
-  socketio.on("switch", data => {
+  socket.on("switch", data => {
    document.getElementById("self").innerHTML = data.html;
   document.getElementById("next").innerHTML = data.next;
   document.getElementById("nextnext").innerHTML = data.nextnext;
@@ -336,7 +336,7 @@
   
   document.getElementById('play').addEventListener('click', function() {
     if (currentPlayer === "{{ userid }}") {
-        socketio.emit("player-turned", selectedCards);
+        socket.emit("player-turned", selectedCards);
     } else {
         const prompt = document.getElementById("prompt");
 
@@ -352,7 +352,7 @@
     }
 });
   
-  socketio.on("game-over", function(data) {
+  socket.on("game-over", function(data) {
     window.location.href = data.url;
   });
   
